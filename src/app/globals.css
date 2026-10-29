@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b0b0c;
+  --bg-elevated: #141416;
+  --bg-panel: #121214;
+  --bg-muted: #1c1c1f;
+  --fg: #f2efe8;
+  --fg-muted: #a39e94;
+  --fg-subtle: #6f6a62;
+  --line: #2a2a2e;
+  --accent: #c45c26;
+  --accent-soft: #e8a05c;
+  --danger: #b33a3a;
+  --focus: #e8a05c;
+  --map-empty: #1a1a1d;
+  --map-stroke: #2f2f34;
+  --map-hover: #3a2218;
+  --shadow-panel: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(196, 92, 38, 0.12), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(232, 160, 92, 0.05), transparent 45%),
+    var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: rgba(196, 92, 38, 0.45);
+  color: var(--fg);
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.map-state {
+  cursor: pointer;
+  stroke: var(--map-stroke);
+  stroke-width: 1;
+  transition: fill 160ms ease, stroke 160ms ease, opacity 160ms ease;
+}
+
+.map-state:hover,
+.map-state:focus-visible {
+  stroke: var(--accent-soft);
+  stroke-width: 1.5;
+  filter: brightness(1.12);
+}
+
+.map-state[aria-pressed="true"] {
+  stroke: var(--accent-soft);
+  stroke-width: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
