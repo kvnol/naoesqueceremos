@@ -45,6 +45,11 @@ export function SiteFooter({ updatedAt, source }: SiteFooterProps) {
           </span>
         ) : null}
       </p>
+      <p>
+        <a href="https://instagram.com/kvnol" target="_blank" rel="noopener noreferrer">
+          Desenvolvido por @kvnol
+        </a> | <a href="https://github.com/kvnol/naoesqueceremos" target="_blank" rel="noopener noreferrer">Contribua com o projeto</a>
+      </p>
     </footer>
   );
 }
