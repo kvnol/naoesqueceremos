@@ -49,6 +49,8 @@ export interface ContentItem {
   credit?: string;
   tags?: string[];
   status: ItemStatus;
+  contributor?: string;
+  createdAt?: string;
 }
 
 export interface ItemFilters {
@@ -68,6 +70,12 @@ export interface CategoryCounts {
   audio: number;
   video: number;
   total: number;
+}
+
+export interface ContentPayload {
+  items: ContentItem[];
+  updatedAt: string | null;
+  source: "sheet" | "fallback";
 }
 
 export const CATEGORIES: Category[] = ["noticia", "imagem", "audio", "video"];

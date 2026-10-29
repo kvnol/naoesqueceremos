@@ -3,8 +3,9 @@
 import { useState } from "react";
 import type { ContentItem } from "@/lib/types";
 import { formatDate } from "@/lib/format";
-import { getEmbedUrl } from "@/lib/media";
+import { resolveMedia } from "@/lib/media";
 import { EmptyState } from "./EmptyState";
+import { SourceOnlyCard } from "./SourceOnlyCard";
 
 interface VideoEmbedProps {
   items: ContentItem[];
@@ -13,7 +14,11 @@ interface VideoEmbedProps {
 
 function VideoCard({ item }: { item: ContentItem }) {
   const [loaded, setLoaded] = useState(false);
-  const embed = getEmbedUrl(item.mediaUrl || item.sourceUrl);
+  const media = resolveMedia("video", item.mediaUrl || item.sourceUrl);
+
+  if (!media.playable || !media.embedUrl) {
+    return <SourceOnlyCard item={item} />;
+  }
 
   return (
     <article className="overflow-hidden rounded-sm border border-[var(--line)] bg-[var(--bg-muted)]/40">
@@ -25,13 +30,14 @@ function VideoCard({ item }: { item: ContentItem }) {
             className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-t from-black/70 to-black/20"
             aria-label={`Carregar vídeo: ${item.title}`}
           >
-            {item.thumbnailUrl && (
+            {(item.thumbnailUrl || media.thumbnailUrl) && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={item.thumbnailUrl}
+                src={item.thumbnailUrl || media.thumbnailUrl}
                 alt=""
                 className="absolute inset-0 h-full w-full object-cover opacity-60"
                 loading="lazy"
+                referrerPolicy="no-referrer"
               />
             )}
             <span className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--accent-soft)]/70 bg-[var(--accent)]/80 text-xl text-white">
@@ -42,28 +48,15 @@ function VideoCard({ item }: { item: ContentItem }) {
             </span>
           </button>
         )}
-        {loaded && embed && (
+        {loaded && (
           <iframe
-            src={embed}
+            src={media.embedUrl}
             title={item.title}
             className="absolute inset-0 h-full w-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             loading="lazy"
           />
-        )}
-        {loaded && !embed && (
-          <div className="absolute inset-0 flex items-center justify-center p-4 text-center text-sm text-[var(--fg-muted)]">
-            Não foi possível incorporar este vídeo.{" "}
-            <a
-              href={item.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-1 text-[var(--accent-soft)] underline"
-            >
-              Abrir fonte
-            </a>
-          </div>
         )}
       </div>
       <div className="space-y-1.5 p-3">
@@ -76,6 +69,11 @@ function VideoCard({ item }: { item: ContentItem }) {
           {item.title}
         </h3>
         <p className="text-sm text-[var(--fg-muted)]">{item.description}</p>
+        {item.contributor && (
+          <p className="text-xs text-[var(--fg-subtle)]">
+            Contribuição de {item.contributor}
+          </p>
+        )}
         <a
           href={item.sourceUrl}
           target="_blank"

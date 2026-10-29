@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { BrazilMap } from "./BrazilMap";
 import { StateDrawer } from "./StateDrawer";
 import {
+  getAvailableYears,
   getCategoryCounts,
   getCountsByUf,
   getItems,
@@ -15,11 +16,16 @@ import {
   buildArchiveSearchParams,
   parseArchiveParams,
 } from "@/lib/url-state";
-import type { Category, SortOrder, UfCode } from "@/lib/types";
+import type { Category, ContentItem, ContentPayload, SortOrder, UfCode } from "@/lib/types";
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/cn";
 
-export function ArchiveHome() {
+interface ArchiveHomeProps {
+  payload: ContentPayload;
+}
+
+export function ArchiveHome({ payload }: ArchiveHomeProps) {
+  const { items: allItems } = payload;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -52,14 +58,18 @@ export function ArchiveHome() {
   );
 
   const mapCounts = useMemo(
-    () => getCountsByUf(dateFilters),
-    [dateFilters],
+    () => getCountsByUf(allItems, dateFilters),
+    [allItems, dateFilters],
   );
   const nationalCount = mapCounts.BR ?? 0;
+  const availableYears = useMemo(
+    () => getAvailableYears(allItems),
+    [allItems],
+  );
 
   const drawerItems = useMemo(() => {
-    if (!state.uf) return [];
-    return getItems({
+    if (!state.uf) return [] as ContentItem[];
+    return getItems(allItems, {
       uf: state.uf,
       from: state.de ?? undefined,
       to: state.ate ?? undefined,
@@ -67,29 +77,29 @@ export function ArchiveHome() {
       tag: state.tag ?? undefined,
       sort: state.ordem,
     });
-  }, [state.uf, state.de, state.ate, state.q, state.tag, state.ordem]);
+  }, [allItems, state.uf, state.de, state.ate, state.q, state.tag, state.ordem]);
 
   const drawerCounts = useMemo(() => {
     if (!state.uf) {
       return { noticia: 0, imagem: 0, audio: 0, video: 0, total: 0 };
     }
-    return getCategoryCounts({
+    return getCategoryCounts(allItems, {
       uf: state.uf,
       from: state.de ?? undefined,
       to: state.ate ?? undefined,
       query: state.q ?? undefined,
       tag: state.tag ?? undefined,
     });
-  }, [state.uf, state.de, state.ate, state.q, state.tag]);
+  }, [allItems, state.uf, state.de, state.ate, state.q, state.tag]);
 
   const yearHistogram = useMemo(() => {
     if (!state.uf) return [];
-    return getYearHistogram({
+    return getYearHistogram(allItems, {
       uf: state.uf,
       query: state.q ?? undefined,
       tag: state.tag ?? undefined,
     });
-  }, [state.uf, state.q, state.tag]);
+  }, [allItems, state.uf, state.q, state.tag]);
 
   const selectedYear =
     state.de &&
@@ -157,6 +167,7 @@ export function ArchiveHome() {
         sort={state.ordem}
         dateFrom={state.de}
         dateTo={state.ate}
+        availableYears={availableYears}
         sharePath={sharePath}
         yearHistogram={yearHistogram}
         selectedYear={selectedYear}

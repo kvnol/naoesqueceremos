@@ -2,31 +2,51 @@
 
 import { cn } from "@/lib/cn";
 
-const YEARS = Array.from({ length: 11 }, (_, i) => 2016 + i);
-
 interface DateFilterProps {
   from: string | null;
   to: string | null;
+  years?: number[];
   onChange: (next: { from: string | null; to: string | null }) => void;
   className?: string;
 }
 
-export function DateFilter({ from, to, onChange, className }: DateFilterProps) {
+export function DateFilter({
+  from,
+  to,
+  years,
+  onChange,
+  className,
+}: DateFilterProps) {
+  const yearList =
+    years && years.length > 0
+      ? years
+      : Array.from({ length: 11 }, (_, i) => 2016 + i);
+
   const activeYear =
-    from && to && from.slice(0, 4) === to.slice(0, 4) && from.endsWith("-01-01") && to.endsWith("-12-31")
+    from &&
+    to &&
+    from.slice(0, 4) === to.slice(0, 4) &&
+    from.endsWith("-01-01") &&
+    to.endsWith("-12-31")
       ? Number(from.slice(0, 4))
       : null;
 
+  const min = `${yearList[0]}-01-01`;
+  const max = `${yearList[yearList.length - 1]}-12-31`;
+
   return (
     <div className={cn("flex flex-col gap-3", className)}>
+      <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--fg-subtle)]">
+        Filtro de data
+      </p>
       <div className="flex flex-wrap items-end gap-3">
         <label className="flex min-w-[8rem] flex-1 flex-col gap-1 text-xs text-[var(--fg-muted)]">
           De
           <input
             type="date"
             value={from ?? ""}
-            min="2016-01-01"
-            max="2026-12-31"
+            min={min}
+            max={max}
             onChange={(e) =>
               onChange({ from: e.target.value || null, to })
             }
@@ -38,8 +58,8 @@ export function DateFilter({ from, to, onChange, className }: DateFilterProps) {
           <input
             type="date"
             value={to ?? ""}
-            min="2016-01-01"
-            max="2026-12-31"
+            min={min}
+            max={max}
             onChange={(e) =>
               onChange({ from, to: e.target.value || null })
             }
@@ -62,7 +82,7 @@ export function DateFilter({ from, to, onChange, className }: DateFilterProps) {
         aria-label="Atalhos por ano"
         className="flex flex-wrap gap-1.5"
       >
-        {YEARS.map((year) => {
+        {yearList.map((year) => {
           const selected = activeYear === year;
           return (
             <button

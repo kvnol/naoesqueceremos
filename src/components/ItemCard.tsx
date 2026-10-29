@@ -19,6 +19,11 @@ export function ItemCard({ item }: ItemCardProps) {
       <p className="mt-2 text-sm leading-relaxed text-[var(--fg-muted)]">
         {item.description}
       </p>
+      {item.contributor && (
+        <p className="mt-2 text-xs text-[var(--fg-subtle)]">
+          Contribuição de {item.contributor}
+        </p>
+      )}
       {item.tags && item.tags.length > 0 && (
         <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Temas">
           {item.tags.map((tag) => (

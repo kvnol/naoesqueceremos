@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SuggestLink } from "./SuggestLink";
 
 export function Header() {
   return (
@@ -32,12 +33,11 @@ export function Header() {
           >
             Sobre
           </Link>
-          <Link
-            href="/sugerir"
+          <SuggestLink
             className="rounded-sm border border-[var(--accent)]/50 bg-[var(--accent)]/10 px-2.5 py-1.5 text-[var(--accent-soft)] transition-colors hover:bg-[var(--accent)]/20 sm:px-3"
           >
             Sugerir
-          </Link>
+          </SuggestLink>
         </nav>
       </div>
     </header>

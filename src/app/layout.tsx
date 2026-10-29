@@ -53,10 +53,6 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col antialiased">
         <Header />
         <main className="flex flex-1 flex-col">{children}</main>
-        <footer className="border-t border-[var(--line)] px-4 py-3 text-center text-xs text-[var(--fg-subtle)] sm:px-6">
-          Lembranças para 2030 · arquivo colaborativo · todo conteúdo exige fonte
-          verificável
-        </footer>
       </body>
     </html>
   );

@@ -1,4 +1,3 @@
-import itemsData from "@/data/items.json";
 import type {
   Category,
   CategoryCounts,
@@ -8,13 +7,7 @@ import type {
   UfCode,
 } from "./types";
 import { CATEGORIES } from "./types";
-
-/**
- * Camada de abstração de conteúdo.
- * Hoje lê `data/items.json`. Troque o corpo destas funções por
- * Supabase / Sheets / Airtable sem alterar a UI.
- */
-const ALL_ITEMS = itemsData as ContentItem[];
+import { normalizeKey } from "./text";
 
 function parseDate(value?: string): number | null {
   if (!value) return null;
@@ -36,8 +29,8 @@ function matchesFilters(item: ContentItem, filters: ItemFilters = {}): boolean {
   if (to !== null && itemDate > to + 24 * 60 * 60 * 1000 - 1) return false;
 
   if (filters.tag) {
-    const needle = filters.tag.toLowerCase();
-    if (!(item.tags ?? []).some((t) => t.toLowerCase() === needle)) return false;
+    const needle = normalizeKey(filters.tag);
+    if (!(item.tags ?? []).some((t) => normalizeKey(t) === needle)) return false;
   }
 
   if (filters.query) {
@@ -47,6 +40,7 @@ function matchesFilters(item: ContentItem, filters: ItemFilters = {}): boolean {
         item.title,
         item.description,
         item.sourceName,
+        item.contributor ?? "",
         ...(item.tags ?? []),
       ]
         .join(" ")
@@ -58,33 +52,46 @@ function matchesFilters(item: ContentItem, filters: ItemFilters = {}): boolean {
   return true;
 }
 
-function sortItems(items: ContentItem[], sort: SortOrder = "recentes"): ContentItem[] {
+function sortItems(
+  items: ContentItem[],
+  sort: SortOrder = "recentes",
+): ContentItem[] {
   const sorted = [...items];
   sorted.sort((a, b) => {
     const diff = (parseDate(a.date) ?? 0) - (parseDate(b.date) ?? 0);
-    return sort === "antigos" ? diff : -diff;
+    if (diff !== 0) return sort === "antigos" ? diff : -diff;
+    const created =
+      (parseDate(a.createdAt) ?? 0) - (parseDate(b.createdAt) ?? 0);
+    return sort === "antigos" ? created : -created;
   });
   return sorted;
 }
 
-export function getItems(filters: ItemFilters = {}): ContentItem[] {
-  const filtered = ALL_ITEMS.filter((item) => matchesFilters(item, filters));
+/**
+ * Filtra e ordena uma lista já carregada.
+ * Mantém a mesma assinatura conceitual de getItems(filters).
+ */
+export function getItems(
+  allItems: ContentItem[],
+  filters: ItemFilters = {},
+): ContentItem[] {
+  const filtered = allItems.filter((item) => matchesFilters(item, filters));
   return sortItems(filtered, filters.sort ?? "recentes");
 }
 
-export function getItemById(id: string): ContentItem | undefined {
-  return ALL_ITEMS.find((item) => item.id === id && item.status === "published");
-}
-
-export function getTotalCount(filters: Omit<ItemFilters, "uf" | "category"> = {}): number {
-  return getItems(filters).length;
+export function getTotalCount(
+  allItems: ContentItem[],
+  filters: Omit<ItemFilters, "uf" | "category"> = {},
+): number {
+  return getItems(allItems, filters).length;
 }
 
 export function getCountsByUf(
+  allItems: ContentItem[],
   filters: Omit<ItemFilters, "uf"> = {},
-): Record<UfCode, number> {
-  const items = getItems(filters);
-  const counts = {} as Record<UfCode, number>;
+): Partial<Record<UfCode, number>> {
+  const items = getItems(allItems, filters);
+  const counts: Partial<Record<UfCode, number>> = {};
   for (const item of items) {
     counts[item.uf] = (counts[item.uf] ?? 0) + 1;
   }
@@ -92,9 +99,10 @@ export function getCountsByUf(
 }
 
 export function getCategoryCounts(
+  allItems: ContentItem[],
   filters: Omit<ItemFilters, "category"> = {},
 ): CategoryCounts {
-  const items = getItems(filters);
+  const items = getItems(allItems, filters);
   const counts: CategoryCounts = {
     noticia: 0,
     imagem: 0,
@@ -109,31 +117,49 @@ export function getCategoryCounts(
 }
 
 export function getYearHistogram(
+  allItems: ContentItem[],
   filters: Omit<ItemFilters, "from" | "to"> = {},
-  yearStart = 2016,
-  yearEnd = 2026,
 ): { year: number; count: number }[] {
-  const items = getItems(filters);
+  const items = getItems(allItems, filters);
+  if (items.length === 0) return [];
+
   const map = new Map<number, number>();
-  for (let y = yearStart; y <= yearEnd; y += 1) map.set(y, 0);
   for (const item of items) {
     const year = Number(item.date.slice(0, 4));
-    if (map.has(year)) map.set(year, (map.get(year) ?? 0) + 1);
+    if (!Number.isFinite(year)) continue;
+    map.set(year, (map.get(year) ?? 0) + 1);
   }
-  return Array.from(map.entries()).map(([year, count]) => ({ year, count }));
+
+  // Preenche anos vazios entre o mínimo e o máximo presentes
+  const years = Array.from(map.keys()).sort((a, b) => a - b);
+  const start = years[0];
+  const end = years[years.length - 1];
+  const result: { year: number; count: number }[] = [];
+  for (let y = start; y <= end; y += 1) {
+    result.push({ year: y, count: map.get(y) ?? 0 });
+  }
+  return result;
 }
 
-export function getAllTags(filters: ItemFilters = {}): string[] {
+export function getAvailableYears(allItems: ContentItem[]): number[] {
+  const set = new Set<number>();
+  for (const item of allItems) {
+    if (item.status !== "published") continue;
+    const year = Number(item.date.slice(0, 4));
+    if (Number.isFinite(year)) set.add(year);
+  }
+  return Array.from(set).sort((a, b) => a - b);
+}
+
+export function getAllTags(
+  allItems: ContentItem[],
+  filters: ItemFilters = {},
+): string[] {
   const set = new Set<string>();
-  for (const item of getItems(filters)) {
+  for (const item of getItems(allItems, filters)) {
     for (const tag of item.tags ?? []) set.add(tag);
   }
   return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
-}
-
-export function getMaxUfCount(filters: Omit<ItemFilters, "uf"> = {}): number {
-  const counts = getCountsByUf(filters);
-  return Math.max(0, ...Object.values(counts));
 }
 
 export function emptyCategoryCounts(): CategoryCounts {

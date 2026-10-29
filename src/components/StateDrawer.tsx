@@ -2,7 +2,6 @@
 
 import { useEffect, useId, useMemo, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import Link from "next/link";
 import { getStateName } from "@/lib/states";
 import { pluralize } from "@/lib/format";
 import {
@@ -23,6 +22,7 @@ import { EmptyState } from "./EmptyState";
 import { CopyLinkButton } from "./CopyLinkButton";
 import { DateFilter } from "./DateFilter";
 import { Timeline } from "./Timeline";
+import { SuggestLink } from "./SuggestLink";
 import { cn } from "@/lib/cn";
 
 interface StateDrawerProps {
@@ -36,6 +36,7 @@ interface StateDrawerProps {
   sort: SortOrder;
   dateFrom: string | null;
   dateTo: string | null;
+  availableYears: number[];
   sharePath: string;
   yearHistogram: { year: number; count: number }[];
   selectedYear: number | null;
@@ -59,6 +60,7 @@ export function StateDrawer({
   sort,
   dateFrom,
   dateTo,
+  availableYears,
   sharePath,
   yearHistogram,
   selectedYear,
@@ -157,6 +159,7 @@ export function StateDrawer({
               <DateFilter
                 from={dateFrom}
                 to={dateTo}
+                years={availableYears}
                 onChange={onDateChange}
               />
 
@@ -254,12 +257,12 @@ export function StateDrawer({
 
               <p className="pb-4 text-center text-xs text-[var(--fg-subtle)]">
                 Conteúdo ausente?{" "}
-                <Link
-                  href={`/sugerir?uf=${uf}`}
+                <SuggestLink
+                  uf={uf}
                   className="text-[var(--accent-soft)] underline-offset-2 hover:underline"
                 >
                   Sugerir para {uf === "BR" ? "o Brasil" : getStateName(uf)}
-                </Link>
+                </SuggestLink>
               </p>
             </div>
           </motion.aside>
