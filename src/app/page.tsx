@@ -34,7 +34,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: "Mapa do Brasil",
+    title: "Não esqueceremos! | Lembranças para 2030",
   };
 }
 
