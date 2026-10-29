@@ -8,6 +8,9 @@ import { CATEGORY_LABELS, type Category } from "@/lib/types";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
+/** ISR da página; o CSV da planilha é buscado sem cache do Next (ver load-content). */
+export const revalidate = 300;
+
 export async function generateMetadata({
   searchParams,
 }: {

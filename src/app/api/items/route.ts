@@ -9,7 +9,8 @@ export async function GET() {
     const payload = await loadContent();
     return NextResponse.json(payload, {
       headers: {
-        "Cache-Control": "s-maxage=300, stale-while-revalidate=60",
+        // Conteúdo já vem fresco do loadContent (no-store + cache-bust).
+        "Cache-Control": "no-store",
       },
     });
   } catch (err) {

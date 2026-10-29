@@ -7,6 +7,8 @@ import type { ContentItem, ContentPayload } from "./types";
 
 type CsvRow = Record<string, string>;
 
+export const SHEET_CACHE_TAG = "sheet-items";
+
 function loadFallback(reason: string): ContentPayload {
   console.warn(`[content] usando fallback items.json — ${reason}`);
   return {
@@ -18,9 +20,18 @@ function loadFallback(reason: string): ContentPayload {
   };
 }
 
+/** Evita cache agressivo do CDN do Google na URL /pub. */
+function withCacheBust(url: string): string {
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}_ts=${Date.now()}`;
+}
+
 async function fetchSheetCsv(url: string): Promise<string> {
-  const res = await fetch(url, {
-    next: { revalidate: 300, tags: ["sheet-items"] },
+  const res = await fetch(withCacheBust(url), {
+    // Sem cache do Next no fetch: a página controla o ISR.
+    // O bust (_ts) também contorna o CDN do Google Sheets.
+    cache: "no-store",
+    next: { tags: [SHEET_CACHE_TAG] },
   });
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} ao buscar CSV`);
@@ -73,13 +84,29 @@ export async function loadContent(): Promise<ContentPayload> {
 
     const published = items.filter((i) => i.status === "published");
 
+    console.info(
+      `[content] sheet ok: ${rows.length} linha(s) CSV → ${published.length} publicado(s)`,
+    );
+
     return {
       items: published,
       updatedAt: new Date().toISOString(),
       source: "sheet",
     };
   } catch (err) {
+    // Deixa o Next marcar a rota como dinâmica (não engolir como "planilha falhou")
+    if (
+      err &&
+      typeof err === "object" &&
+      "digest" in err &&
+      (err as { digest?: string }).digest === "DYNAMIC_SERVER_USAGE"
+    ) {
+      throw err;
+    }
     const message = err instanceof Error ? err.message : String(err);
+    if (message.includes("Dynamic server usage")) {
+      throw err;
+    }
     return loadFallback(`erro ao buscar/planilhar CSV: ${message}`);
   }
 }

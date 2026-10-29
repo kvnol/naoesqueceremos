@@ -1,5 +1,6 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
+import { loadContent, SHEET_CACHE_TAG } from "@/lib/load-content";
 
 /**
  * Força atualização imediata do cache após aprovar um item na planilha.
@@ -29,13 +30,33 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, message: "Não autorizado" }, { status: 401 });
   }
 
-  revalidateTag("sheet-items", "max");
+  // Invalida cache do Next e regenera rotas
+  revalidateTag(SHEET_CACHE_TAG, "max");
+  revalidatePath("/", "layout");
   revalidatePath("/");
-  revalidatePath("/sobre");
+  revalidatePath("/api/items");
+
+  // Busca fresca agora (com cache-bust) para diagnosticar a planilha
+  const payload = await loadContent();
 
   return NextResponse.json({
     ok: true,
     revalidated: true,
     at: new Date().toISOString(),
+    source: payload.source,
+    itemCount: payload.items.length,
+    items: payload.items.map((i) => ({
+      id: i.id,
+      uf: i.uf,
+      category: i.category,
+      title: i.title,
+      date: i.date,
+    })),
+    hint:
+      payload.source === "fallback"
+        ? "SHEET_CSV_URL ausente ou falhou o fetch — usando items.json"
+        : payload.items.length === 0
+          ? "CSV veio vazio ou todas as linhas foram descartadas (veja logs do servidor)"
+          : "Se faltam itens, confira se estão na aba publicada e se o Google já propagou o CSV (às vezes demora alguns minutos; File → Share → Publish to web).",
   });
 }
