@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useTransition } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { BrazilMap } from "./BrazilMap";
 import { StateDrawer } from "./StateDrawer";
 import {
@@ -15,8 +15,15 @@ import {
   archiveStateToSharePath,
   buildArchiveSearchParams,
   parseArchiveParams,
+  type ArchiveUrlState,
 } from "@/lib/url-state";
-import type { Category, ContentItem, ContentPayload, SortOrder, UfCode } from "@/lib/types";
+import type {
+  CategoryTab,
+  ContentItem,
+  ContentPayload,
+  SortOrder,
+  UfCode,
+} from "@/lib/types";
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/cn";
 
@@ -24,28 +31,40 @@ interface ArchiveHomeProps {
   payload: ContentPayload;
 }
 
+function writeUrl(pathname: string, state: ArchiveUrlState) {
+  const params = buildArchiveSearchParams(state);
+  const qs = params.toString();
+  const url = qs ? `${pathname}?${qs}` : pathname;
+  window.history.replaceState(window.history.state, "", url);
+}
+
 export function ArchiveHome({ payload }: ArchiveHomeProps) {
   const { items: allItems } = payload;
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [, startTransition] = useTransition();
 
-  const state = useMemo(
-    () => parseArchiveParams(searchParams),
-    [searchParams],
+  // Estado local = fonte da verdade (abre o painel na hora, sem round-trip RSC)
+  const [state, setState] = useState<ArchiveUrlState>(() =>
+    parseArchiveParams(searchParams),
   );
 
+  useEffect(() => {
+    function onPopState() {
+      setState(parseArchiveParams(new URLSearchParams(window.location.search)));
+    }
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
   const pushState = useCallback(
-    (patch: Partial<typeof state>) => {
-      const merged = { ...state, ...patch };
-      const params = buildArchiveSearchParams(merged);
-      const qs = params.toString();
-      startTransition(() => {
-        router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    (patch: Partial<ArchiveUrlState>) => {
+      setState((prev) => {
+        const merged = { ...prev, ...patch };
+        writeUrl(pathname, merged);
+        return merged;
       });
     },
-    [pathname, router, state],
+    [pathname],
   );
 
   const dateFilters = useMemo(
@@ -110,7 +129,7 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
       ? Number(state.de.slice(0, 4))
       : null;
 
-  const activeCategory: Category = state.cat ?? "noticia";
+  const activeCategory: CategoryTab = state.cat ?? "todos";
   const sharePath = archiveStateToSharePath(state);
 
   return (
@@ -122,7 +141,7 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
             onClick={() =>
               pushState({
                 uf: "BR",
-                cat: state.cat ?? "noticia",
+                cat: state.cat ?? "todos",
               })
             }
             aria-pressed={state.uf === "BR"}
@@ -150,7 +169,7 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
           onSelect={(uf: UfCode) =>
             pushState({
               uf,
-              cat: state.cat ?? "noticia",
+              cat: state.cat ?? "todos",
             })
           }
         />

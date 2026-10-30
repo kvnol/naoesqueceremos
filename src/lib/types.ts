@@ -80,11 +80,27 @@ export interface ContentPayload {
 
 export const CATEGORIES: Category[] = ["noticia", "imagem", "audio", "video"];
 
+/** Abas do painel, incluindo a visão unificada. */
+export type CategoryTab = Category | "todos";
+
+export const CATEGORY_TABS: CategoryTab[] = [
+  "todos",
+  "noticia",
+  "imagem",
+  "audio",
+  "video",
+];
+
 export const CATEGORY_LABELS: Record<Category, string> = {
   noticia: "Notícias",
   imagem: "Imagens",
   audio: "Áudios",
   video: "Vídeos",
+};
+
+export const CATEGORY_TAB_LABELS: Record<CategoryTab, string> = {
+  todos: "Todos",
+  ...CATEGORY_LABELS,
 };
 
 export const CATEGORY_PARAM: Record<Category, string> = {

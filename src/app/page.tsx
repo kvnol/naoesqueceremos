@@ -4,7 +4,7 @@ import { ArchiveHome } from "@/components/ArchiveHome";
 import { SiteFooter } from "@/components/SiteFooter";
 import { loadContent } from "@/lib/load-content";
 import { getStateName, isValidUf } from "@/lib/states";
-import { CATEGORY_LABELS, type Category } from "@/lib/types";
+import { CATEGORY_TAB_LABELS, type CategoryTab } from "@/lib/types";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -23,8 +23,8 @@ export async function generateMetadata({
   if (ufRaw && isValidUf(ufRaw)) {
     const name = getStateName(ufRaw);
     const catLabel =
-      catRaw && catRaw in CATEGORY_LABELS
-        ? ` · ${CATEGORY_LABELS[catRaw as Category]}`
+      catRaw && catRaw in CATEGORY_TAB_LABELS
+        ? ` · ${CATEGORY_TAB_LABELS[catRaw as CategoryTab]}`
         : "";
     const title = `${name}${catLabel}`;
     return {
@@ -41,32 +41,16 @@ export async function generateMetadata({
   };
 }
 
-function HomeFallback() {
-  return (
-    <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-4 px-4 py-6">
-      <div className="h-10 w-48 animate-pulse rounded-sm bg-[var(--bg-muted)]" />
-      <div className="min-h-[60vh] flex-1 animate-pulse rounded-sm bg-[var(--bg-muted)]/60" />
-      <p className="text-center text-sm text-[var(--fg-muted)]">
-        Carregando arquivo…
-      </p>
-    </div>
-  );
-}
-
-async function HomeContent() {
+export default async function HomePage() {
   const payload = await loadContent();
+
   return (
     <>
-      <ArchiveHome payload={payload} />
+      {/* Suspense só por causa do useSearchParams no client — sem skeleton/animação */}
+      <Suspense fallback={null}>
+        <ArchiveHome payload={payload} />
+      </Suspense>
       <SiteFooter updatedAt={payload.updatedAt} source={payload.source} />
     </>
-  );
-}
-
-export default function HomePage() {
-  return (
-    <Suspense fallback={<HomeFallback />}>
-      <HomeContent />
-    </Suspense>
   );
 }

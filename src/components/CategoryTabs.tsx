@@ -3,20 +3,20 @@
 import { cn } from "@/lib/cn";
 import { formatCount } from "@/lib/format";
 import {
-  CATEGORIES,
-  CATEGORY_LABELS,
-  type Category,
+  CATEGORY_TAB_LABELS,
+  CATEGORY_TABS,
   type CategoryCounts,
+  type CategoryTab,
 } from "@/lib/types";
 
 interface CategoryTabsProps {
   counts: CategoryCounts;
-  active: Category | null;
-  onChange: (category: Category) => void;
+  active: CategoryTab | null;
+  onChange: (category: CategoryTab) => void;
 }
 
 export function CategoryTabs({ counts, active, onChange }: CategoryTabsProps) {
-  const current = active ?? "noticia";
+  const current = active ?? "todos";
 
   return (
     <div
@@ -24,9 +24,10 @@ export function CategoryTabs({ counts, active, onChange }: CategoryTabsProps) {
       aria-label="Categorias de conteúdo"
       className="flex gap-1 overflow-x-auto border-b border-[var(--line)] pb-px"
     >
-      {CATEGORIES.map((category) => {
+      {CATEGORY_TABS.map((category) => {
         const selected = current === category;
-        const count = counts[category];
+        const count =
+          category === "todos" ? counts.total : counts[category];
         return (
           <button
             key={category}
@@ -44,7 +45,7 @@ export function CategoryTabs({ counts, active, onChange }: CategoryTabsProps) {
                 : "text-[var(--fg-muted)] hover:text-[var(--fg)]",
             )}
           >
-            <span className="font-medium">{CATEGORY_LABELS[category]}</span>
+            <span className="font-medium">{CATEGORY_TAB_LABELS[category]}</span>
             <span
               className={cn(
                 "ml-2 inline-flex min-w-[1.25rem] justify-center rounded-sm px-1.5 py-0.5 text-[11px] tabular-nums",

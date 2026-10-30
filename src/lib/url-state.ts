@@ -1,10 +1,10 @@
-import type { Category, SortOrder, UfCode } from "./types";
-import { CATEGORIES } from "./types";
+import type { Category, CategoryTab, SortOrder, UfCode } from "./types";
+import { CATEGORIES, CATEGORY_TABS } from "./types";
 import { isValidUf } from "./states";
 
 export interface ArchiveUrlState {
   uf: UfCode | null;
-  cat: Category | null;
+  cat: CategoryTab | null;
   de: string | null;
   ate: string | null;
   q: string | null;
@@ -14,8 +14,8 @@ export interface ArchiveUrlState {
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-function isCategory(value: string | null): value is Category {
-  return !!value && (CATEGORIES as string[]).includes(value);
+function isCategoryTab(value: string | null): value is CategoryTab {
+  return !!value && (CATEGORY_TABS as string[]).includes(value);
 }
 
 function isSort(value: string | null): value is SortOrder {
@@ -44,7 +44,7 @@ export function parseArchiveParams(
 
   return {
     uf: isValidUf(ufRaw) ? ufRaw : null,
-    cat: isCategory(catRaw) ? catRaw : null,
+    cat: isCategoryTab(catRaw) ? catRaw : null,
     de: de && DATE_RE.test(de) ? de : null,
     ate: ate && DATE_RE.test(ate) ? ate : null,
     q: q?.trim() || null,
@@ -55,9 +55,8 @@ export function parseArchiveParams(
 
 export function buildArchiveSearchParams(
   state: Partial<ArchiveUrlState>,
-  base?: URLSearchParams,
 ): URLSearchParams {
-  const next = new URLSearchParams(base?.toString());
+  const next = new URLSearchParams();
 
   const setOrDelete = (key: string, value: string | null | undefined) => {
     if (!value) next.delete(key);
@@ -65,7 +64,11 @@ export function buildArchiveSearchParams(
   };
 
   if ("uf" in state) setOrDelete("uf", state.uf ?? null);
-  if ("cat" in state) setOrDelete("cat", state.cat ?? null);
+  if ("cat" in state) {
+    // "todos" é o padrão — não polui a URL
+    if (!state.cat || state.cat === "todos") next.delete("cat");
+    else setOrDelete("cat", state.cat);
+  }
   if ("de" in state) setOrDelete("de", state.de ?? null);
   if ("ate" in state) setOrDelete("ate", state.ate ?? null);
   if ("q" in state) setOrDelete("q", state.q ?? null);
@@ -82,4 +85,8 @@ export function archiveStateToSharePath(state: ArchiveUrlState): string {
   const params = buildArchiveSearchParams(state);
   const qs = params.toString();
   return qs ? `/?${qs}` : "/";
+}
+
+export function isCategory(value: string | null | undefined): value is Category {
+  return !!value && (CATEGORIES as string[]).includes(value);
 }
