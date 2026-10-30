@@ -7,6 +7,8 @@ import type { UfCode } from "@/lib/types";
 import { countToFill } from "@/lib/intensity";
 import { formatCount, pluralize } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { isModifiedClick } from "@/lib/links";
+import { statePath } from "@/lib/url-state";
 
 interface BrazilMapProps {
   counts: Partial<Record<UfCode, number>>;
@@ -30,16 +32,6 @@ export function BrazilMap({
   const tipUf = hovered ?? (selectedUf && selectedUf !== "BR" ? selectedUf : null);
   const tipCount = tipUf ? (counts[tipUf] ?? 0) : 0;
 
-  function onKeyDown(
-    e: React.KeyboardEvent<SVGPathElement>,
-    uf: UfCode,
-  ) {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      onSelect(uf);
-    }
-  }
-
   return (
     <div
       className={cn(
@@ -49,8 +41,8 @@ export function BrazilMap({
     >
       <svg
         viewBox={BRAZIL_MAP_VIEWBOX}
-        role="img"
-        aria-label="Mapa do Brasil com estados clicáveis"
+        role="group"
+        aria-label="Mapa do Brasil: escolha um estado"
         className="mx-auto h-full max-h-[min(82dvh,920px)] w-full max-w-[980px]"
       >
         <title>Mapa interativo do Brasil</title>
@@ -60,23 +52,31 @@ export function BrazilMap({
           const count = counts[uf] ?? 0;
           const selected = selectedUf === uf;
           return (
-            <path
+            // Link real para rastreadores e "abrir em nova aba";
+            // clique simples abre o painel sem recarregar a página.
+            <a
               key={uf}
-              id={`state-${uf}`}
-              d={d}
-              className="map-state"
-              fill={countToFill(count, max)}
-              tabIndex={0}
-              role="button"
+              href={statePath(uf)}
               aria-label={`${getStateName(uf)}: ${pluralize(count, "registro", "registros")}`}
-              aria-pressed={selected}
+              aria-current={selected ? "page" : undefined}
+              className="map-link"
               onMouseEnter={() => setHovered(uf)}
               onMouseLeave={() => setHovered(null)}
               onFocus={() => setHovered(uf)}
               onBlur={() => setHovered(null)}
-              onClick={() => onSelect(uf)}
-              onKeyDown={(e) => onKeyDown(e, uf)}
-            />
+              onClick={(e) => {
+                if (isModifiedClick(e)) return;
+                e.preventDefault();
+                onSelect(uf);
+              }}
+            >
+              <path
+                id={`state-${uf}`}
+                d={d}
+                className="map-state"
+                fill={countToFill(count, max)}
+              />
+            </a>
           );
         })}
       </svg>

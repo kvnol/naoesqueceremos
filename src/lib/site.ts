@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getStateName } from "./states";
+import type { UfCode } from "./types";
 
 export const SITE_NAME = "Lembranças para 2030";
 
@@ -19,12 +21,25 @@ function resolveSiteUrl(): string {
 
 export const SITE_URL = resolveSiteUrl();
 
+export const HOME_TITLE = "Não esqueceremos!";
+
+/** Título da página de um estado, sem o nome do site. */
+export function stateTitle(uf: UfCode): string {
+  return uf === "BR" ? "Brasil (âmbito nacional)" : getStateName(uf);
+}
+
+export function fullPageTitle(title?: string): string {
+  return title ? `${title} — ${SITE_NAME}` : SITE_NAME;
+}
+
 interface PageMetadataInput {
   /** Título da página sem o nome do site; omitido na home. */
   title?: string;
   description?: string;
   /** Caminho canônico relativo (ex.: "/sobre", "/?uf=SP"). */
   path: string;
+  /** Imagem de compartilhamento; padrão é a da raiz. */
+  image?: string;
   noindex?: boolean;
 }
 
@@ -37,13 +52,14 @@ export function buildPageMetadata({
   title,
   description = SITE_DESCRIPTION,
   path,
+  image = "/opengraph-image",
   noindex = false,
 }: PageMetadataInput): Metadata {
-  const fullTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME;
+  const fullTitle = fullPageTitle(title);
   // Páginas que definem openGraph próprio não herdam o opengraph-image da raiz
   const images = [
     {
-      url: "/opengraph-image",
+      url: image,
       width: 1200,
       height: 630,
       alt: `${SITE_NAME} — ${SITE_TAGLINE}`,

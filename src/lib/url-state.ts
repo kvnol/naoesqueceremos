@@ -45,6 +45,28 @@ export function parseArchiveParams(
   };
 }
 
+/** Caminho canônico da página de um estado (ex.: "/estado/sp"). */
+export function statePath(uf: UfCode): string {
+  return `/estado/${uf.toLowerCase()}`;
+}
+
+/** Converte o slug da rota ("sp", "SP") em UF válida. */
+export function ufFromSlug(slug: string | null | undefined): UfCode | null {
+  const uf = slug?.toUpperCase() ?? null;
+  return isValidUf(uf) ? uf : null;
+}
+
+/** Lê o estado do arquivo a partir de pathname (/estado/:uf) + query string. */
+export function parseArchiveLocation(
+  pathname: string,
+  search: string,
+): ArchiveUrlState {
+  const match = /^\/estado\/([^/]+)\/?$/.exec(pathname);
+  const uf = match ? ufFromSlug(decodeURIComponent(match[1])) : null;
+  return { ...parseArchiveParams(new URLSearchParams(search)), uf };
+}
+
+/** Filtros da query string; a UF vai no caminho (ver statePath). */
 export function buildArchiveSearchParams(
   state: Partial<ArchiveUrlState>,
 ): URLSearchParams {
@@ -55,7 +77,6 @@ export function buildArchiveSearchParams(
     else next.set(key, value);
   };
 
-  if ("uf" in state) setOrDelete("uf", state.uf ?? null);
   if ("cat" in state) {
     if (!state.cat || state.cat === "todos") next.delete("cat");
     else setOrDelete("cat", state.cat);
@@ -71,9 +92,10 @@ export function buildArchiveSearchParams(
 }
 
 export function archiveStateToSharePath(state: ArchiveUrlState): string {
-  const params = buildArchiveSearchParams(state);
-  const qs = params.toString();
-  return qs ? `/?${qs}` : "/";
+  if (!state.uf) return "/";
+  const qs = buildArchiveSearchParams(state).toString();
+  const path = statePath(state.uf);
+  return qs ? `${path}?${qs}` : path;
 }
 
 export function isCategory(value: string | null | undefined): value is Category {

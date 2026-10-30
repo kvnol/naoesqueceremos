@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
 import { BrazilMap } from "./BrazilMap";
 import { StateDrawer } from "./StateDrawer";
 import {
@@ -11,8 +10,8 @@ import {
 } from "@/lib/content";
 import {
   archiveStateToSharePath,
-  buildArchiveSearchParams,
-  parseArchiveParams,
+  parseArchiveLocation,
+  statePath,
   type ArchiveUrlState,
 } from "@/lib/url-state";
 import type {
@@ -24,44 +23,70 @@ import type {
 } from "@/lib/types";
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { isModifiedClick } from "@/lib/links";
+import { HOME_TITLE, fullPageTitle, stateTitle } from "@/lib/site";
 
 interface ArchiveHomeProps {
   payload: ContentPayload;
+  /** UF da rota (/estado/:uf); null na home. */
+  initialUf: UfCode | null;
 }
 
-function writeUrl(pathname: string, state: ArchiveUrlState) {
-  const params = buildArchiveSearchParams(state);
-  const qs = params.toString();
-  const url = qs ? `${pathname}?${qs}` : pathname;
-  window.history.replaceState(window.history.state, "", url);
+function readLocation(): ArchiveUrlState {
+  return parseArchiveLocation(window.location.pathname, window.location.search);
 }
 
-export function ArchiveHome({ payload }: ArchiveHomeProps) {
+/**
+ * Troca de estado vira uma entrada no histórico (voltar fecha o painel);
+ * filtros só substituem a URL atual.
+ */
+function writeUrl(state: ArchiveUrlState, mode: "push" | "replace") {
+  const url = archiveStateToSharePath(state);
+  const current = window.location.pathname + window.location.search;
+  if (url === current) return;
+  if (mode === "push") window.history.pushState(window.history.state, "", url);
+  else window.history.replaceState(window.history.state, "", url);
+}
+
+export function ArchiveHome({ payload, initialUf }: ArchiveHomeProps) {
   const { items: allItems } = payload;
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  const [state, setState] = useState<ArchiveUrlState>(() =>
-    parseArchiveParams(searchParams),
-  );
+  // Render inicial só com a UF da rota, igual ao HTML estático gerado no servidor;
+  // filtros da query entram depois da hidratação.
+  const [state, setState] = useState<ArchiveUrlState>({
+    uf: initialUf,
+    cat: null,
+    q: null,
+    tag: null,
+    ordem: "recentes",
+  });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza com a URL após hidratar
+    setState(readLocation());
     function onPopState() {
-      setState(parseArchiveParams(new URLSearchParams(window.location.search)));
+      setState(readLocation());
     }
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
-  const pushState = useCallback(
-    (patch: Partial<ArchiveUrlState>) => {
-      setState((prev) => {
-        const merged = { ...prev, ...patch };
-        writeUrl(pathname, merged);
-        return merged;
-      });
-    },
-    [pathname],
+  // O título da aba acompanha o estado aberto (troca sem navegação do Next)
+  useEffect(() => {
+    document.title = fullPageTitle(state.uf ? stateTitle(state.uf) : HOME_TITLE);
+  }, [state.uf]);
+
+  const pushState = useCallback((patch: Partial<ArchiveUrlState>) => {
+    setState((prev) => {
+      const merged = { ...prev, ...patch };
+      writeUrl(merged, merged.uf !== prev.uf ? "push" : "replace");
+      return merged;
+    });
+  }, []);
+
+  const selectUf = useCallback(
+    (uf: UfCode) => pushState({ uf, cat: state.cat ?? "todos" }),
+    [pushState, state.cat],
   );
 
   const mapCounts = useMemo(
@@ -98,15 +123,14 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
     <div className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col px-3 py-3 sm:px-5 sm:py-4">
       <section className="relative flex min-h-0 flex-1 flex-col rounded-sm border border-[var(--line)] bg-[linear-gradient(180deg,rgba(20,20,22,0.9),rgba(11,11,12,0.4))] p-2 sm:p-4">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2 sm:mb-3">
-          <button
-            type="button"
-            onClick={() =>
-              pushState({
-                uf: "BR",
-                cat: state.cat ?? "todos",
-              })
-            }
-            aria-pressed={state.uf === "BR"}
+          <a
+            href={statePath("BR")}
+            onClick={(e) => {
+              if (isModifiedClick(e)) return;
+              e.preventDefault();
+              selectUf("BR");
+            }}
+            aria-current={state.uf === "BR" ? "page" : undefined}
             className={cn(
               "rounded-sm border px-3 py-2 text-sm transition-colors",
               state.uf === "BR"
@@ -118,7 +142,7 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
             <span className="ml-2 tabular-nums text-[var(--fg-subtle)]">
               {formatCount(nationalCount)}
             </span>
-          </button>
+          </a>
           <p className="text-xs text-[var(--fg-subtle)]">
             Clique em um estado · intensidade = quantidade
           </p>
@@ -128,12 +152,7 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
           className="min-h-0 flex-1"
           counts={mapCounts}
           selectedUf={state.uf}
-          onSelect={(uf: UfCode) =>
-            pushState({
-              uf,
-              cat: state.cat ?? "todos",
-            })
-          }
+          onSelect={selectUf}
         />
       </section>
 

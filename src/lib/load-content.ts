@@ -21,18 +21,23 @@ function loadFallback(reason: string): ContentPayload {
   };
 }
 
-/** Evita cache agressivo do CDN do Google na URL /pub. */
+/** Intervalo de atualização (s) das páginas e do CSV em cache. */
+export const CONTENT_REVALIDATE_SECONDS = 300;
+
+/**
+ * Evita cache agressivo do CDN do Google na URL /pub.
+ * O bust muda a cada minuto (e não a cada request) para que as páginas
+ * geradas no mesmo intervalo — build e ISR — reaproveitem um único download.
+ */
 function withCacheBust(url: string): string {
   const sep = url.includes("?") ? "&" : "?";
-  return `${url}${sep}_ts=${Date.now()}`;
+  return `${url}${sep}_ts=${Math.floor(Date.now() / 60_000)}`;
 }
 
 async function fetchSheetCsv(url: string): Promise<string> {
   const res = await fetch(withCacheBust(url), {
-    // Sem cache do Next no fetch: a página controla o ISR.
-    // O bust (_ts) também contorna o CDN do Google Sheets.
-    cache: "no-store",
-    next: { tags: [SHEET_CACHE_TAG] },
+    // Cacheado (não no-store) para as páginas poderem ser estáticas com ISR.
+    next: { revalidate: CONTENT_REVALIDATE_SECONDS, tags: [SHEET_CACHE_TAG] },
   });
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} ao buscar CSV`);
