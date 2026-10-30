@@ -29,7 +29,7 @@ export function ItemCard({ item }: ItemCardProps) {
           {item.tags.map((tag) => (
             <li
               key={tag}
-              className="rounded-sm bg-[var(--bg-muted)] px-2 py-0.5 text-[11px] text-[var(--fg-subtle)]"
+              className="rounded-sm bg-[var(--bg-muted)] px-2 py-0.5 text-[14px] text-[var(--fg-subtle)]"
             >
               {tag}
             </li>

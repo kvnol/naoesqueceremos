@@ -20,7 +20,7 @@ export function Timeline({
 
   return (
     <div className={cn("w-full", className)}>
-      <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-[var(--fg-subtle)]">
+      <p className="mb-2 text-[14px] uppercase tracking-[0.16em] text-[var(--fg-subtle)]">
         Linha do tempo
       </p>
       <div

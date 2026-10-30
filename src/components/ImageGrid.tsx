@@ -60,12 +60,12 @@ export function ImageGrid({ items, uf }: ImageGridProps) {
                   <p className="line-clamp-2 text-sm font-medium leading-snug text-[var(--fg)]">
                     {item.title}
                   </p>
-                  <p className="text-[11px] text-[var(--fg-subtle)]">
+                  <p className="text-[14px] text-[var(--fg-subtle)]">
                     {formatDate(item.date)}
                     {item.credit ? ` · ${item.credit}` : ""}
                   </p>
                   {item.contributor && (
-                    <p className="text-[11px] text-[var(--fg-subtle)]">
+                    <p className="text-[14px] text-[var(--fg-subtle)]">
                       Contribuição de {item.contributor}
                     </p>
                   )}

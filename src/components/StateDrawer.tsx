@@ -120,7 +120,7 @@ export function StateDrawer({
       >
         <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] px-4 py-4 sm:px-5">
           <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--fg-subtle)]">
+            <p className="text-[14px] uppercase tracking-[0.18em] text-[var(--fg-subtle)]">
               {uf === "BR" ? "Âmbito nacional" : uf}
             </p>
             <h2
@@ -200,7 +200,7 @@ export function StateDrawer({
                   aria-pressed={selected}
                   onClick={() => onTagChange(selected ? null : t)}
                   className={cn(
-                    "rounded-sm border px-2 py-1 text-[11px] transition-colors",
+                    "rounded-sm border px-2 py-1 text-[14px] transition-colors",
                     selected
                       ? "border-[var(--accent)] bg-[var(--accent)]/20 text-[var(--accent-soft)]"
                       : "border-[var(--line)] text-[var(--fg-subtle)] hover:text-[var(--fg)]",

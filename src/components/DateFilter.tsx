@@ -36,7 +36,7 @@ export function DateFilter({
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--fg-subtle)]">
+      <p className="text-[14px] uppercase tracking-[0.16em] text-[var(--fg-subtle)]">
         Filtro de data
       </p>
       <div className="flex flex-wrap items-end gap-3">

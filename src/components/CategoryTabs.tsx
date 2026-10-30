@@ -48,7 +48,7 @@ export function CategoryTabs({ counts, active, onChange }: CategoryTabsProps) {
             <span className="font-medium">{CATEGORY_TAB_LABELS[category]}</span>
             <span
               className={cn(
-                "ml-2 inline-flex min-w-[1.25rem] justify-center rounded-sm px-1.5 py-0.5 text-[11px] tabular-nums",
+                "ml-2 inline-flex min-w-[1.25rem] justify-center rounded-sm px-1.5 py-0.5 text-[14px] tabular-nums",
                 selected
                   ? "bg-[var(--accent)]/25 text-[var(--accent-soft)]"
                   : "bg-[var(--bg-muted)] text-[var(--fg-subtle)]",

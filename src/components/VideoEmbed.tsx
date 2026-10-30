@@ -72,7 +72,7 @@ function VideoCard({ item }: { item: ContentItem }) {
                 referrerPolicy="no-referrer"
               />
             )}
-            <span className="relative z-10 rounded-sm border border-white/20 bg-black/40 px-2 py-0.5 text-[11px] uppercase tracking-[0.14em] text-[var(--fg-muted)]">
+            <span className="relative z-10 rounded-sm border border-white/20 bg-black/40 px-2 py-0.5 text-[14px] uppercase tracking-[0.14em] text-[var(--fg-muted)]">
               {label}
             </span>
             <span className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--accent-soft)]/70 bg-[var(--accent)]/80 text-xl text-white shadow-lg">
@@ -81,7 +81,7 @@ function VideoCard({ item }: { item: ContentItem }) {
             <span className="relative z-10 max-w-[16rem] text-sm text-[var(--fg)]">
               Clique para carregar o player
             </span>
-            <span className="relative z-10 max-w-[18rem] text-[11px] text-[var(--fg-subtle)]">
+            <span className="relative z-10 max-w-[18rem] text-[14px] text-[var(--fg-subtle)]">
               {social
                 ? "O embed oficial da rede será aberto neste painel"
                 : "O vídeo será carregado sob demanda"}

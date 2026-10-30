@@ -16,7 +16,7 @@ export default function SobrePage() {
   return (
     <>
       <article className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--accent-soft)]">
+        <p className="text-[14px] uppercase tracking-[0.2em] text-[var(--accent-soft)]">
           Manifesto
         </p>
         <h1 className="mt-2 font-[family-name:var(--font-display)] text-4xl tracking-tight text-[var(--fg)]">

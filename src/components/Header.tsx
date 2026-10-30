@@ -12,7 +12,7 @@ export function Header() {
           <span className="font-[family-name:var(--font-display)] text-lg leading-tight tracking-tight text-[var(--fg)] sm:text-xl">
             Lembranças para 2030
           </span>
-          <span className="truncate text-[11px] text-[var(--fg-subtle)] transition-colors group-hover:text-[var(--accent-soft)] sm:text-xs">
+          <span className="truncate text-[14px] text-[var(--fg-subtle)] transition-colors group-hover:text-[var(--accent-soft)] sm:text-xs">
             Não esqueceremos o que a extrema direita fez neste país
           </span>
         </Link>

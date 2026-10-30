@@ -169,7 +169,7 @@ function AudioCard({ item }: { item: ContentItem }) {
             aria-label="Progresso do áudio"
             className="w-full accent-[var(--accent)]"
           />
-          <div className="mt-0.5 flex justify-between text-[11px] tabular-nums text-[var(--fg-subtle)]">
+          <div className="mt-0.5 flex justify-between text-[14px] tabular-nums text-[var(--fg-subtle)]">
             <span>{fmt(progress)}</span>
             <span>{fmt(duration)}</span>
           </div>
