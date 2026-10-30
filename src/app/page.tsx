@@ -3,8 +3,10 @@ import { Suspense } from "react";
 import { ArchiveHome } from "@/components/ArchiveHome";
 import { SiteFooter } from "@/components/SiteFooter";
 import { loadContent } from "@/lib/load-content";
-import { getStateName, isValidUf } from "@/lib/states";
-import { CATEGORY_TAB_LABELS, type CategoryTab } from "@/lib/types";
+import { SITE_NAME, SITE_TAGLINE, buildPageMetadata } from "@/lib/site";
+import { getStateName } from "@/lib/states";
+import { CATEGORY_TAB_LABELS } from "@/lib/types";
+import { parseArchiveParams } from "@/lib/url-state";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -16,29 +18,31 @@ export async function generateMetadata({
 }: {
   searchParams: SearchParams;
 }): Promise<Metadata> {
-  const params = await searchParams;
-  const ufRaw = Array.isArray(params.uf) ? params.uf[0] : params.uf;
-  const catRaw = Array.isArray(params.cat) ? params.cat[0] : params.cat;
+  const [params, payload] = await Promise.all([searchParams, loadContent()]);
+  const state = parseArchiveParams(params);
+  // Busca, tema e ordenação são recortes do mesmo conteúdo: não indexar.
+  // Itens de fallback são placeholders fictícios: nunca indexar.
+  const noindex =
+    !!(state.q || state.tag || state.ordem !== "recentes") ||
+    payload.source === "fallback";
 
-  if (ufRaw && isValidUf(ufRaw)) {
-    const name = getStateName(ufRaw);
+  if (state.uf) {
+    const name = getStateName(state.uf);
     const catLabel =
-      catRaw && catRaw in CATEGORY_TAB_LABELS
-        ? ` · ${CATEGORY_TAB_LABELS[catRaw as CategoryTab]}`
+      state.cat && state.cat !== "todos"
+        ? ` · ${CATEGORY_TAB_LABELS[state.cat]}`
         : "";
-    const title = `${name}${catLabel}`;
-    return {
-      title,
-      openGraph: {
-        title: `Lembranças para 2030 — ${name}`,
-        description: `Registros de memória política em ${name}. Não esqueceremos o que a extrema direita fez neste país.`,
-      },
-    };
+    const where = state.uf === "BR" ? "no Brasil (âmbito nacional)" : `em ${name}`;
+    return buildPageMetadata({
+      title: `${name}${catLabel}`,
+      description: `Notícias, imagens, áudios e vídeos sobre a memória política ${where}. ${SITE_TAGLINE}`,
+      // Abas de categoria apontam para a página do estado
+      path: `/?uf=${state.uf}`,
+      noindex,
+    });
   }
 
-  return {
-    title: "Não esqueceremos! | Lembranças para 2030",
-  };
+  return buildPageMetadata({ title: "Não esqueceremos!", path: "/", noindex });
 }
 
 export default async function HomePage() {
@@ -46,6 +50,9 @@ export default async function HomePage() {
 
   return (
     <>
+      <h1 className="sr-only">
+        {SITE_NAME}: mapa da memória política do Brasil por estado
+      </h1>
       {/* Suspense só por causa do useSearchParams no client — sem skeleton/animação */}
       <Suspense fallback={null}>
         <ArchiveHome payload={payload} />

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import Papa from "papaparse";
 import fallbackItems from "@/data/items.json";
 import { mapRowsToItems } from "./sheet-mapper";
@@ -61,8 +62,10 @@ function parseCsv(csvText: string): CsvRow[] {
 /**
  * Carrega itens publicados da planilha (CSV) ou do fallback local.
  * Somente servidor — a URL da planilha não vai para o client.
+ * Memoizado por request (o cache-bust impede a memoização do fetch),
+ * para generateMetadata e a página não baixarem o CSV duas vezes.
  */
-export async function loadContent(): Promise<ContentPayload> {
+export const loadContent = cache(async (): Promise<ContentPayload> => {
   const url = process.env.SHEET_CSV_URL?.trim();
   if (!url) {
     return loadFallback("SHEET_CSV_URL ausente");
@@ -109,4 +112,4 @@ export async function loadContent(): Promise<ContentPayload> {
     }
     return loadFallback(`erro ao buscar/planilhar CSV: ${message}`);
   }
-}
+});

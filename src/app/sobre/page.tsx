@@ -2,15 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SuggestLink } from "@/components/SuggestLink";
 import { SiteFooter } from "@/components/SiteFooter";
+import { buildPageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Sobre",
   description:
     "Manifesto, critérios editoriais e como contribuir com o arquivo Lembranças para 2030.",
-  openGraph: {
-    title: "Sobre — Lembranças para 2030",
-  },
-};
+  path: "/sobre",
+});
 
 export default function SobrePage() {
   return (
