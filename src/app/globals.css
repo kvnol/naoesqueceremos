@@ -76,21 +76,20 @@ a {
 .map-state {
   cursor: pointer;
   stroke: var(--map-stroke);
-  stroke-width: 1.25;
-  vector-effect: non-scaling-stroke;
+  stroke-width: 1;
   transition: fill 160ms ease, stroke 160ms ease, opacity 160ms ease;
 }
 
 .map-state:hover,
 .map-state:focus-visible {
   stroke: var(--accent-soft);
-  stroke-width: 1.75;
+  stroke-width: 1.5;
   filter: brightness(1.12);
 }
 
 .map-state[aria-pressed="true"] {
   stroke: var(--accent-soft);
-  stroke-width: 2.25;
+  stroke-width: 2;
 }
 
 @media (prefers-reduced-motion: reduce) {
