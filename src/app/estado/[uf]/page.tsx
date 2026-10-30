@@ -4,6 +4,7 @@ import { ArchiveHome } from "@/components/ArchiveHome";
 import { SiteFooter } from "@/components/SiteFooter";
 import { StateIndex } from "@/components/StateIndex";
 import { getItems } from "@/lib/content";
+import { serializeJsonLd } from "@/lib/json-ld";
 import { pluralize } from "@/lib/format";
 import { loadContent } from "@/lib/load-content";
 import {
@@ -105,7 +106,7 @@ export default async function StatePage({ params }: { params: Params }) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <h1 className="sr-only">
         Memória política {placeLabel(uf)}: {pluralize(items.length, "registro", "registros")}

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
 import { Header } from "@/components/Header";
+import { serializeJsonLd } from "@/lib/json-ld";
 import {
   SITE_DESCRIPTION,
   SITE_NAME,
@@ -54,7 +55,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col antialiased">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(websiteJsonLd) }}
         />
         <Header />
         <main className="flex flex-1 flex-col">{children}</main>
