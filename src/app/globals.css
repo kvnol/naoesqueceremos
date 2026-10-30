@@ -80,14 +80,18 @@ a {
   transition: fill 160ms ease, stroke 160ms ease, opacity 160ms ease;
 }
 
-.map-state:hover,
-.map-state:focus-visible {
+.map-link {
+  outline: none;
+}
+
+.map-link:hover .map-state,
+.map-link:focus-visible .map-state {
   stroke: var(--accent-soft);
   stroke-width: 1.5;
   filter: brightness(1.12);
 }
 
-.map-state[aria-pressed="true"] {
+.map-link[aria-current="page"] .map-state {
   stroke: var(--accent-soft);
   stroke-width: 2;
 }
