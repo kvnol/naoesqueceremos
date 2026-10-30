@@ -5,11 +5,9 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { BrazilMap } from "./BrazilMap";
 import { StateDrawer } from "./StateDrawer";
 import {
-  getAvailableYears,
   getCategoryCounts,
   getCountsByUf,
   getItems,
-  getYearHistogram,
 } from "@/lib/content";
 import {
   archiveStateToSharePath,
@@ -43,7 +41,6 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Estado local = fonte da verdade (abre o painel na hora, sem round-trip RSC)
   const [state, setState] = useState<ArchiveUrlState>(() =>
     parseArchiveParams(searchParams),
   );
@@ -67,36 +64,21 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
     [pathname],
   );
 
-  const dateFilters = useMemo(
-    () => ({
-      from: state.de ?? undefined,
-      to: state.ate ?? undefined,
-      sort: state.ordem,
-    }),
-    [state.de, state.ate, state.ordem],
-  );
-
   const mapCounts = useMemo(
-    () => getCountsByUf(allItems, dateFilters),
-    [allItems, dateFilters],
+    () => getCountsByUf(allItems, { sort: state.ordem }),
+    [allItems, state.ordem],
   );
   const nationalCount = mapCounts.BR ?? 0;
-  const availableYears = useMemo(
-    () => getAvailableYears(allItems),
-    [allItems],
-  );
 
   const drawerItems = useMemo(() => {
     if (!state.uf) return [] as ContentItem[];
     return getItems(allItems, {
       uf: state.uf,
-      from: state.de ?? undefined,
-      to: state.ate ?? undefined,
       query: state.q ?? undefined,
       tag: state.tag ?? undefined,
       sort: state.ordem,
     });
-  }, [allItems, state.uf, state.de, state.ate, state.q, state.tag, state.ordem]);
+  }, [allItems, state.uf, state.q, state.tag, state.ordem]);
 
   const drawerCounts = useMemo(() => {
     if (!state.uf) {
@@ -104,30 +86,10 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
     }
     return getCategoryCounts(allItems, {
       uf: state.uf,
-      from: state.de ?? undefined,
-      to: state.ate ?? undefined,
-      query: state.q ?? undefined,
-      tag: state.tag ?? undefined,
-    });
-  }, [allItems, state.uf, state.de, state.ate, state.q, state.tag]);
-
-  const yearHistogram = useMemo(() => {
-    if (!state.uf) return [];
-    return getYearHistogram(allItems, {
-      uf: state.uf,
       query: state.q ?? undefined,
       tag: state.tag ?? undefined,
     });
   }, [allItems, state.uf, state.q, state.tag]);
-
-  const selectedYear =
-    state.de &&
-    state.ate &&
-    state.de.slice(0, 4) === state.ate.slice(0, 4) &&
-    state.de.endsWith("-01-01") &&
-    state.ate.endsWith("-12-31")
-      ? Number(state.de.slice(0, 4))
-      : null;
 
   const activeCategory: CategoryTab = state.cat ?? "todos";
   const sharePath = archiveStateToSharePath(state);
@@ -184,21 +146,7 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
         query={state.q ?? ""}
         tag={state.tag}
         sort={state.ordem}
-        dateFrom={state.de}
-        dateTo={state.ate}
-        availableYears={availableYears}
         sharePath={sharePath}
-        yearHistogram={yearHistogram}
-        selectedYear={selectedYear}
-        onDateChange={({ from, to }) => pushState({ de: from, ate: to })}
-        onSelectYear={(year) => {
-          if (year === null) pushState({ de: null, ate: null });
-          else
-            pushState({
-              de: `${year}-01-01`,
-              ate: `${year}-12-31`,
-            });
-        }}
         onClose={() =>
           pushState({
             uf: null,

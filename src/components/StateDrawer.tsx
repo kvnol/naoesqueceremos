@@ -20,8 +20,6 @@ import { VideoEmbedList } from "./VideoEmbed";
 import { AllItemsFeed } from "./AllItemsFeed";
 import { EmptyState } from "./EmptyState";
 import { CopyLinkButton } from "./CopyLinkButton";
-import { DateFilter } from "./DateFilter";
-import { Timeline } from "./Timeline";
 import { SuggestLink } from "./SuggestLink";
 import { cn } from "@/lib/cn";
 
@@ -34,14 +32,7 @@ interface StateDrawerProps {
   query: string;
   tag: string | null;
   sort: SortOrder;
-  dateFrom: string | null;
-  dateTo: string | null;
-  availableYears: number[];
   sharePath: string;
-  yearHistogram: { year: number; count: number }[];
-  selectedYear: number | null;
-  onDateChange: (next: { from: string | null; to: string | null }) => void;
-  onSelectYear: (year: number | null) => void;
   onClose: () => void;
   onCategoryChange: (category: CategoryTab) => void;
   onQueryChange: (query: string) => void;
@@ -58,14 +49,7 @@ export function StateDrawer({
   query,
   tag,
   sort,
-  dateFrom,
-  dateTo,
-  availableYears,
   sharePath,
-  yearHistogram,
-  selectedYear,
-  onDateChange,
-  onSelectYear,
   onClose,
   onCategoryChange,
   onQueryChange,
@@ -147,19 +131,6 @@ export function StateDrawer({
         </div>
 
         <div className="scrollbar-thin flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-5">
-          <DateFilter
-            from={dateFrom}
-            to={dateTo}
-            years={availableYears}
-            onChange={onDateChange}
-          />
-
-          <Timeline
-            data={yearHistogram}
-            selectedYear={selectedYear}
-            onSelectYear={onSelectYear}
-          />
-
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <label className="relative min-w-0 flex-1 text-sm">
               <span className="sr-only">Buscar neste estado</span>
@@ -200,7 +171,7 @@ export function StateDrawer({
                   aria-pressed={selected}
                   onClick={() => onTagChange(selected ? null : t)}
                   className={cn(
-                    "rounded-sm border px-2 py-1 text-[14px] transition-colors",
+                    "rounded-sm border px-2 py-1 text-[11px] transition-colors",
                     selected
                       ? "border-[var(--accent)] bg-[var(--accent)]/20 text-[var(--accent-soft)]"
                       : "border-[var(--line)] text-[var(--fg-subtle)] hover:text-[var(--fg)]",

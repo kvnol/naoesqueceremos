@@ -116,41 +116,6 @@ export function getCategoryCounts(
   return counts;
 }
 
-export function getYearHistogram(
-  allItems: ContentItem[],
-  filters: Omit<ItemFilters, "from" | "to"> = {},
-): { year: number; count: number }[] {
-  const items = getItems(allItems, filters);
-  if (items.length === 0) return [];
-
-  const map = new Map<number, number>();
-  for (const item of items) {
-    const year = Number(item.date.slice(0, 4));
-    if (!Number.isFinite(year)) continue;
-    map.set(year, (map.get(year) ?? 0) + 1);
-  }
-
-  // Preenche anos vazios entre o mínimo e o máximo presentes
-  const years = Array.from(map.keys()).sort((a, b) => a - b);
-  const start = years[0];
-  const end = years[years.length - 1];
-  const result: { year: number; count: number }[] = [];
-  for (let y = start; y <= end; y += 1) {
-    result.push({ year: y, count: map.get(y) ?? 0 });
-  }
-  return result;
-}
-
-export function getAvailableYears(allItems: ContentItem[]): number[] {
-  const set = new Set<number>();
-  for (const item of allItems) {
-    if (item.status !== "published") continue;
-    const year = Number(item.date.slice(0, 4));
-    if (Number.isFinite(year)) set.add(year);
-  }
-  return Array.from(set).sort((a, b) => a - b);
-}
-
 export function getAllTags(
   allItems: ContentItem[],
   filters: ItemFilters = {},

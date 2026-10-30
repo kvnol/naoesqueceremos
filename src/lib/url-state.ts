@@ -5,14 +5,10 @@ import { isValidUf } from "./states";
 export interface ArchiveUrlState {
   uf: UfCode | null;
   cat: CategoryTab | null;
-  de: string | null;
-  ate: string | null;
   q: string | null;
   tag: string | null;
   ordem: SortOrder;
 }
-
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function isCategoryTab(value: string | null): value is CategoryTab {
   return !!value && (CATEGORY_TABS as string[]).includes(value);
@@ -36,8 +32,6 @@ export function parseArchiveParams(
 
   const ufRaw = get("uf");
   const catRaw = get("cat");
-  const de = get("de");
-  const ate = get("ate");
   const q = get("q");
   const tag = get("tag");
   const ordemRaw = get("ordem");
@@ -45,8 +39,6 @@ export function parseArchiveParams(
   return {
     uf: isValidUf(ufRaw) ? ufRaw : null,
     cat: isCategoryTab(catRaw) ? catRaw : null,
-    de: de && DATE_RE.test(de) ? de : null,
-    ate: ate && DATE_RE.test(ate) ? ate : null,
     q: q?.trim() || null,
     tag: tag?.trim() || null,
     ordem: isSort(ordemRaw) ? ordemRaw : "recentes",
@@ -65,12 +57,9 @@ export function buildArchiveSearchParams(
 
   if ("uf" in state) setOrDelete("uf", state.uf ?? null);
   if ("cat" in state) {
-    // "todos" é o padrão — não polui a URL
     if (!state.cat || state.cat === "todos") next.delete("cat");
     else setOrDelete("cat", state.cat);
   }
-  if ("de" in state) setOrDelete("de", state.de ?? null);
-  if ("ate" in state) setOrDelete("ate", state.ate ?? null);
   if ("q" in state) setOrDelete("q", state.q ?? null);
   if ("tag" in state) setOrDelete("tag", state.tag ?? null);
   if ("ordem" in state) {
