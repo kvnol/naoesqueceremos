@@ -12,6 +12,7 @@
     "generate:map": "node scripts/generate-world-map.mjs"
   },
   "dependencies": {
+    "@next/third-parties": "^16.4.3",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
     "next": "16.4.3",

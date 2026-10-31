@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Header } from "@/components/Header";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ArchiveHome } from "@/components/ArchiveHome";
 import { loadContent } from "@/lib/load-content";
 import "./globals.css";
+
+const gaId = process.env.NEXT_PUBLIC_GA_ID ?? "G-VJKSWTDFJ6";
 
 const display = Fraunces({
   variable: "--font-display",
@@ -68,6 +71,7 @@ export default async function RootLayout({
         {/* Páginas (ex.: Sobre) como modal por cima */}
         <div className="relative z-40">{children}</div>
         <SiteFooter updatedAt={payload.updatedAt} source={payload.source} />
+        {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
       </body>
     </html>
   );
