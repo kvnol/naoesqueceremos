@@ -31,6 +31,10 @@ export function BrazilMap({
     hovered ?? (selectedUf && selectedUf !== "BR" ? selectedUf : null);
   const tipCount = tipUf ? (counts[tipUf] ?? 0) : 0;
 
+  const mapTitle = tipUf
+    ? `${getStateName(tipUf)} (${tipUf}) — ${pluralize(tipCount, "registro", "registros")}`
+    : "Só o Brasil é focado";
+
   function onKeyDown(e: React.KeyboardEvent<SVGPathElement>, uf: UfCode) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -46,10 +50,10 @@ export function BrazilMap({
         viewBox={WORLD_MAP_VIEWBOX}
         preserveAspectRatio="xMidYMid slice"
         role="img"
-        aria-label="Mapa-múndi com o Brasil clicável por estado"
+        aria-label={mapTitle}
         className="h-full w-full"
       >
-        <title>Mapa interativo — só o Brasil é clicável</title>
+        <title>{mapTitle}</title>
         <rect width="100%" height="100%" fill="var(--map-ocean)" />
 
         <g aria-hidden="true">
