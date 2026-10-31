@@ -17,6 +17,7 @@ export function EmptyState({
       </p>
       <SuggestLink
         uf={uf}
+        location="drawer_empty"
         className="inline-flex rounded-sm border border-[var(--accent)]/60 bg-[var(--accent)]/15 px-3 py-2 text-sm text-[var(--accent-soft)] transition-colors hover:bg-[var(--accent)]/25"
       >
         Sugerir conteúdo{uf ? " para este estado" : ""}

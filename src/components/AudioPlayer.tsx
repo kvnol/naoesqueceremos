@@ -6,6 +6,7 @@ import { formatDate } from "@/lib/format";
 import { resolveMedia } from "@/lib/media";
 import { EmptyState } from "./EmptyState";
 import { SourceOnlyCard } from "./SourceOnlyCard";
+import { trackClickSource } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 
 interface AudioPlayerProps {
@@ -93,6 +94,13 @@ function AudioCard({ item }: { item: ContentItem }) {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block text-sm text-[var(--accent-soft)] underline-offset-2 hover:underline"
+            onClick={() =>
+              trackClickSource({
+                uf: item.uf,
+                category: item.category,
+                source_name: item.sourceName,
+              })
+            }
           >
             Fonte original
           </a>
@@ -181,6 +189,13 @@ function AudioCard({ item }: { item: ContentItem }) {
         target="_blank"
         rel="noopener noreferrer"
         className="mt-3 inline-block text-sm text-[var(--accent-soft)] underline-offset-2 hover:underline"
+        onClick={() =>
+          trackClickSource({
+            uf: item.uf,
+            category: item.category,
+            source_name: item.sourceName,
+          })
+        }
       >
         Fonte original
       </a>

@@ -36,3 +36,24 @@ npm run dev
 ```
 
 Detalhes de configuração estão em `.env.example`. Em dúvida, abra uma issue ou fale com quem mantém o projeto.
+
+## Analytics (GA4)
+
+O site usa Google Analytics 4 (`NEXT_PUBLIC_GA_ID`) com **Consent Mode v2**: por padrão `analytics_storage` fica `denied` até a pessoa aceitar o banner (preferência em `localStorage` → `ga_consent`). Em desenvolvimento os eventos não são enviados, salvo `NEXT_PUBLIC_GA_DEBUG=true`.
+
+### Eventos customizados
+
+Cadastre no GA4 (Admin → Eventos / Dimensões personalizadas) os parâmetros em **snake_case**. Não enviamos dados pessoais nem URLs de fontes.
+
+| Evento | Quando | Parâmetros |
+| --- | --- | --- |
+| `open_state` | Abre o painel de um UF / Brasil | `uf` |
+| `change_category` | Troca a aba do painel | `uf`, `category` |
+| `click_source` | Clique em “Fonte original” ou “Arquivado” | `uf`, `category`, `source_name` |
+| `click_suggest` | Clique em Sugerir | `location` (`header` \| `drawer_empty` \| `footer` \| `sobre`), `uf?` |
+| `copy_link` | Copia o link do painel | `uf` |
+| `apply_date_filter` | *(reservado — UI de data ainda não existe)* | `from`, `to` |
+
+Dimensões sugeridas no GA4 (escopo evento): `uf`, `category`, `source_name`, `location`.
+
+Privacidade: [/privacidade](https://naoesqueceremos.vercel.app/privacidade).

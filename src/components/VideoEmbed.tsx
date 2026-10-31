@@ -6,6 +6,7 @@ import { formatDate } from "@/lib/format";
 import { isSocialEmbed, resolveMedia, type MediaKind } from "@/lib/media";
 import { EmptyState } from "./EmptyState";
 import { SourceOnlyCard } from "./SourceOnlyCard";
+import { trackClickSource } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 
 interface VideoEmbedProps {
@@ -140,6 +141,13 @@ function VideoCard({ item }: { item: ContentItem }) {
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-[var(--fg-muted)] underline-offset-2 hover:underline"
+            onClick={() =>
+              trackClickSource({
+                uf: item.uf,
+                category: item.category,
+                source_name: item.sourceName,
+              })
+            }
           >
             Fonte original
           </a>

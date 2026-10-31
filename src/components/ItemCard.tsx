@@ -1,11 +1,22 @@
+"use client";
+
 import type { ContentItem } from "@/lib/types";
 import { formatDate } from "@/lib/format";
+import { trackClickSource } from "@/lib/analytics";
 
 interface ItemCardProps {
   item: ContentItem;
 }
 
 export function ItemCard({ item }: ItemCardProps) {
+  function onSourceClick(sourceName: string) {
+    trackClickSource({
+      uf: item.uf,
+      category: item.category,
+      source_name: sourceName,
+    });
+  }
+
   return (
     <article className="border-b border-[var(--line)] py-4 last:border-b-0">
       <div className="mb-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-[var(--fg-subtle)]">
@@ -42,6 +53,7 @@ export function ItemCard({ item }: ItemCardProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="text-[var(--accent-soft)] underline-offset-2 hover:underline"
+          onClick={() => onSourceClick(item.sourceName)}
         >
           Fonte original
         </a>
@@ -51,8 +63,9 @@ export function ItemCard({ item }: ItemCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             className="text-[var(--fg-muted)] underline-offset-2 hover:underline"
+            onClick={() => onSourceClick(item.sourceName)}
           >
-            Arquivo
+            Arquivado
           </a>
         )}
       </div>

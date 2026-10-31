@@ -1,9 +1,13 @@
+"use client";
+
 import { getSuggestUrl, type SuggestParams } from "@/lib/suggest";
+import { trackClickSuggest, type SuggestLocation } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 
 interface SuggestLinkProps extends SuggestParams {
   children: React.ReactNode;
   className?: string;
+  location: SuggestLocation;
   /** Texto acessível se children for só ícone */
   "aria-label"?: string;
 }
@@ -16,6 +20,7 @@ export function SuggestLink({
   className,
   uf,
   categoria,
+  location,
   ...rest
 }: SuggestLinkProps) {
   const href = getSuggestUrl({ uf, categoria });
@@ -27,6 +32,7 @@ export function SuggestLink({
       target="_blank"
       rel="noopener noreferrer"
       className={cn(className)}
+      onClick={() => trackClickSuggest(location, uf)}
       {...rest}
     >
       {children}

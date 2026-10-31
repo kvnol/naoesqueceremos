@@ -1,5 +1,8 @@
+"use client";
+
 import type { ContentItem } from "@/lib/types";
 import { formatDate } from "@/lib/format";
+import { trackClickSource } from "@/lib/analytics";
 
 interface SourceOnlyCardProps {
   item: ContentItem;
@@ -33,6 +36,13 @@ export function SourceOnlyCard({
         target="_blank"
         rel="noopener noreferrer"
         className="mt-3 inline-flex rounded-sm border border-[var(--accent)]/50 bg-[var(--accent)]/15 px-3 py-1.5 text-sm text-[var(--accent-soft)] hover:bg-[var(--accent)]/25"
+        onClick={() =>
+          trackClickSource({
+            uf: item.uf,
+            category: item.category,
+            source_name: item.sourceName,
+          })
+        }
       >
         Ver na fonte original
       </a>

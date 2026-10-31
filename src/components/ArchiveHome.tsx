@@ -25,6 +25,7 @@ import type {
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { COUNT_BUCKETS } from "@/lib/intensity";
+import { trackChangeCategory, trackOpenState } from "@/lib/analytics";
 
 interface ArchiveHomeProps {
   payload: ContentPayload;
@@ -96,11 +97,13 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
   const activeCategory: CategoryTab = state.cat ?? "todos";
   const sharePath = archiveStateToSharePath(state);
 
-  const openUf = (uf: UfCode) =>
+  const openUf = (uf: UfCode) => {
+    trackOpenState(uf);
     pushState({
       uf,
       cat: state.cat ?? "todos",
     });
+  };
 
   return (
     <>
@@ -165,7 +168,10 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
             tag: null,
           })
         }
-        onCategoryChange={(cat) => pushState({ cat })}
+        onCategoryChange={(cat) => {
+          if (state.uf) trackChangeCategory(state.uf, cat);
+          pushState({ cat });
+        }}
         onQueryChange={(q) => pushState({ q: q || null })}
         onTagChange={(tag) => pushState({ tag })}
         onSortChange={(ordem: SortOrder) => pushState({ ordem })}

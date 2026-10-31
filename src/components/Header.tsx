@@ -33,7 +33,10 @@ export function Header() {
           >
             Sobre
           </Link>
-          <SuggestLink className="rounded-sm border border-[var(--line)] px-2.5 py-1.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:underline">
+          <SuggestLink
+            location="header"
+            className="rounded-sm border border-[var(--line)] px-2.5 py-1.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:underline"
+          >
             Sugerir conteúdo
           </SuggestLink>
         </nav>

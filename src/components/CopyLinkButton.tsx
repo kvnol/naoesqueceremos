@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { trackCopyLink } from "@/lib/analytics";
+import type { UfCode } from "@/lib/types";
 
 interface CopyLinkButtonProps {
   path: string;
+  uf: UfCode;
 }
 
-export function CopyLinkButton({ path }: CopyLinkButtonProps) {
+export function CopyLinkButton({ path, uf }: CopyLinkButtonProps) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -17,6 +20,7 @@ export function CopyLinkButton({ path }: CopyLinkButtonProps) {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      trackCopyLink(uf);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);

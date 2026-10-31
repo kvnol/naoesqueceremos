@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ArchiveHome } from "@/components/ArchiveHome";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { ConsentBanner } from "@/components/ConsentBanner";
 import { loadContent } from "@/lib/load-content";
 import "./globals.css";
 
@@ -72,6 +73,7 @@ export default async function RootLayout({
         {/* Páginas (ex.: Sobre) como modal por cima */}
         <div className="relative z-40">{children}</div>
         <SiteFooter updatedAt={payload.updatedAt} source={payload.source} />
+        <ConsentBanner />
       </body>
     </html>
   );

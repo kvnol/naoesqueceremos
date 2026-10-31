@@ -118,7 +118,7 @@ export function StateDrawer({
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <CopyLinkButton path={sharePath} />
+            <CopyLinkButton path={sharePath} uf={uf} />
             <button
               ref={closeRef}
               type="button"
@@ -223,6 +223,7 @@ export function StateDrawer({
             Conteúdo ausente?{" "}
             <SuggestLink
               uf={uf}
+              location="drawer_empty"
               className="text-[var(--accent-soft)] underline-offset-2 hover:underline"
             >
               Sugerir para {uf === "BR" ? "o Brasil" : getStateName(uf)}

@@ -30,9 +30,18 @@ export function SiteFooter({ updatedAt, source }: SiteFooterProps) {
           ) : null}
         </p>
         <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-          <SuggestLink className="text-[var(--accent)] underline-offset-2 hover:underline">
+          <SuggestLink
+            location="footer"
+            className="text-[var(--accent)] underline-offset-2 hover:underline"
+          >
             Sugerir
           </SuggestLink>
+          <a
+            href="/privacidade"
+            className="hover:text-[var(--fg)] hover:underline"
+          >
+            Privacidade
+          </a>
           <a
             href="https://instagram.com/kvnol"
             target="_blank"

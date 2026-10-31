@@ -70,7 +70,10 @@ export default function SobrePage() {
           da fonte e uma descrição clara.
         </p>
         <p>
-          <SuggestLink className="rounded-sm border border-[var(--line)] px-2.5 py-1.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:underline">
+          <SuggestLink
+            location="sobre"
+            className="rounded-sm border border-[var(--line)] px-2.5 py-1.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:underline"
+          >
             Abrir formulário de sugestão
           </SuggestLink>
         </p>
