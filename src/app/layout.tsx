@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import { Header } from "@/components/Header";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ArchiveHome } from "@/components/ArchiveHome";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { loadContent } from "@/lib/load-content";
 import "./globals.css";
 
