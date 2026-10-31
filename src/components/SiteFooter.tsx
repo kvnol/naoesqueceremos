@@ -1,5 +1,5 @@
 import { SuggestLink } from "./SuggestLink";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
 
 interface SiteFooterProps {
   updatedAt?: string | null;
@@ -7,19 +7,7 @@ interface SiteFooterProps {
 }
 
 export function SiteFooter({ updatedAt, source }: SiteFooterProps) {
-  let updatedLabel: string | null = null;
-  if (updatedAt) {
-    const d = new Date(updatedAt);
-    if (!Number.isNaN(d.getTime())) {
-      updatedLabel = new Intl.DateTimeFormat("pt-BR", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(d);
-    }
-  }
+  const updatedLabel = updatedAt ? formatDateTime(updatedAt) : null;
 
   return (
     <footer className="chrome-bar pointer-events-none fixed inset-x-0 bottom-0 z-30 border-t border-[var(--line)]/70">
