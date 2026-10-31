@@ -70,7 +70,7 @@ export default function SobrePage() {
           da fonte e uma descrição clara.
         </p>
         <p>
-          <SuggestLink className="inline-flex rounded-sm bg-[var(--accent)] px-3 py-2 text-sm font-medium text-white transition-[filter] hover:brightness-110">
+          <SuggestLink className="rounded-sm border border-[var(--line)] px-2.5 py-1.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:underline">
             Abrir formulário de sugestão
           </SuggestLink>
         </p>

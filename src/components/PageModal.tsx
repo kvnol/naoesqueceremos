@@ -30,10 +30,10 @@ export function PageModal({ title, children }: PageModalProps) {
 
   return (
     <div className="page-modal">
+      <div className="page-modal-backdrop" />
       <Link
         href="/"
         aria-label="Fechar e voltar ao mapa"
-        className="page-modal-backdrop"
         replace
       />
       <article
@@ -48,7 +48,7 @@ export function PageModal({ title, children }: PageModalProps) {
           </p>
           <Link
             href="/"
-            className="rounded-sm border border-[var(--line)] px-2.5 py-1.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)]"
+            className="rounded-sm border border-[var(--line)] px-2.5 py-1.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:underline"
             replace
           >
             Fechar

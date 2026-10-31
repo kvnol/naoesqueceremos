@@ -23,17 +23,17 @@ export function Header() {
         >
           <Link
             href="/"
-            className="rounded-sm px-2 py-1.5 text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)] sm:px-3"
+            className="rounded-sm px-2 py-1.5 text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)] sm:px-3 hover:underline"
           >
             Mapa
           </Link>
           <Link
             href="/sobre"
-            className="rounded-sm px-2 py-1.5 text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)] sm:px-3"
+            className="rounded-sm px-2 py-1.5 text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)] sm:px-3 hover:underline"
           >
             Sobre
           </Link>
-          <SuggestLink className="rounded-sm border border-[var(--line)] px-2.5 py-1.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)]">
+          <SuggestLink className="rounded-sm border border-[var(--line)] px-2.5 py-1.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:underline">
             Sugerir conteúdo
           </SuggestLink>
         </nav>

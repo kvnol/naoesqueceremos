@@ -49,7 +49,7 @@ export function SiteFooter({ updatedAt, source }: SiteFooterProps) {
             href="https://instagram.com/kvnol"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-[var(--fg)]"
+            className="hover:text-[var(--fg)] hover:underline"
           >
             @kvnol
           </a>
@@ -57,7 +57,7 @@ export function SiteFooter({ updatedAt, source }: SiteFooterProps) {
             href="https://github.com/kvnol/naoesqueceremos"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-[var(--fg)]"
+            className="hover:text-[var(--fg)] hover:underline"
           >
             GitHub
           </a>
