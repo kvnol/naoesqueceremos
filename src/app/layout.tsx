@@ -62,6 +62,7 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR" className={`${display.variable} ${body.variable} h-full`}>
+      <head>{gaId ? <GoogleAnalytics gaId={gaId} /> : null}</head>
       <body className="relative h-full antialiased">
         <Header />
         {/* Mapa persistente sob todas as rotas */}
@@ -71,7 +72,6 @@ export default async function RootLayout({
         {/* Páginas (ex.: Sobre) como modal por cima */}
         <div className="relative z-40">{children}</div>
         <SiteFooter updatedAt={payload.updatedAt} source={payload.source} />
-        {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
       </body>
     </html>
   );

@@ -3,8 +3,7 @@ interface GoogleAnalyticsProps {
 }
 
 /**
- * gtag.js no HTML do servidor (não via client-only do @next/third-parties),
- * para a inicialização aparecer no código-fonte e o GA registrar visitas.
+ * gtag.js no <head> (SSR), no formato esperado pelo validador do Google.
  */
 export function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
   if (!gaId) return null;
