@@ -27,7 +27,7 @@ export function CopyLinkButton({ path }: CopyLinkButtonProps) {
     <button
       type="button"
       onClick={handleCopy}
-      className="rounded-sm border border-[var(--line)] px-2.5 py-1.5 text-xs text-[var(--fg-muted)] transition-colors hover:border-[var(--fg-subtle)] hover:text-[var(--fg)]"
+      className="rounded-sm border border-[var(--line)] px-2.5 py-1.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)]"
       aria-live="polite"
     >
       {copied ? "Link copiado" : "Copiar link"}

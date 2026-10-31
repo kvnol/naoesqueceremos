@@ -1,7 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { BRAZIL_MAP_VIEWBOX, BRAZIL_STATE_PATHS } from "@/data/brazil-paths";
+import { useState } from "react";
+import {
+  BRAZIL_STATE_PATHS,
+  WORLD_LOCKED_PATHS,
+  WORLD_MAP_VIEWBOX,
+} from "@/data/world-map-paths";
 import { MAP_UFS, getStateName } from "@/lib/states";
 import type { UfCode } from "@/lib/types";
 import { countToFill } from "@/lib/intensity";
@@ -22,18 +26,12 @@ export function BrazilMap({
   className,
 }: BrazilMapProps) {
   const [hovered, setHovered] = useState<UfCode | null>(null);
-  const max = useMemo(
-    () => Math.max(1, ...MAP_UFS.map((uf) => counts[uf] ?? 0)),
-    [counts],
-  );
 
-  const tipUf = hovered ?? (selectedUf && selectedUf !== "BR" ? selectedUf : null);
+  const tipUf =
+    hovered ?? (selectedUf && selectedUf !== "BR" ? selectedUf : null);
   const tipCount = tipUf ? (counts[tipUf] ?? 0) : 0;
 
-  function onKeyDown(
-    e: React.KeyboardEvent<SVGPathElement>,
-    uf: UfCode,
-  ) {
+  function onKeyDown(e: React.KeyboardEvent<SVGPathElement>, uf: UfCode) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       onSelect(uf);
@@ -42,62 +40,71 @@ export function BrazilMap({
 
   return (
     <div
-      className={cn(
-        "relative flex w-full items-center justify-center",
-        className,
-      )}
+      className={cn("map-stage bg-[var(--map-ocean)]", className)}
     >
       <svg
-        viewBox={BRAZIL_MAP_VIEWBOX}
+        viewBox={WORLD_MAP_VIEWBOX}
+        preserveAspectRatio="xMidYMid slice"
         role="img"
-        aria-label="Mapa do Brasil com estados clicáveis"
-        className="mx-auto h-full max-h-[min(82dvh,920px)] w-full max-w-[980px]"
+        aria-label="Mapa-múndi com o Brasil clicável por estado"
+        className="h-full w-full"
       >
-        <title>Mapa interativo do Brasil</title>
-        {MAP_UFS.map((uf) => {
-          const d = BRAZIL_STATE_PATHS[uf];
-          if (!d) return null;
-          const count = counts[uf] ?? 0;
-          const selected = selectedUf === uf;
-          return (
-            <path
-              key={uf}
-              id={`state-${uf}`}
-              d={d}
-              className="map-state"
-              fill={countToFill(count, max)}
-              tabIndex={0}
-              role="button"
-              aria-label={`${getStateName(uf)}: ${pluralize(count, "registro", "registros")}`}
-              aria-pressed={selected}
-              onMouseEnter={() => setHovered(uf)}
-              onMouseLeave={() => setHovered(null)}
-              onFocus={() => setHovered(uf)}
-              onBlur={() => setHovered(null)}
-              onClick={() => onSelect(uf)}
-              onKeyDown={(e) => onKeyDown(e, uf)}
-            />
-          );
-        })}
+        <title>Mapa interativo — só o Brasil é clicável</title>
+        <rect width="100%" height="100%" fill="var(--map-ocean)" />
+
+        <g aria-hidden="true">
+          {WORLD_LOCKED_PATHS.map((d, i) => (
+            <path key={i} d={d} className="map-country-locked" />
+          ))}
+        </g>
+
+        <g>
+          {MAP_UFS.map((uf) => {
+            const d = BRAZIL_STATE_PATHS[uf];
+            if (!d) return null;
+            const count = counts[uf] ?? 0;
+            const selected = selectedUf === uf;
+            return (
+              <path
+                key={uf}
+                id={`state-${uf}`}
+                d={d}
+                className="map-state"
+                fill={countToFill(count)}
+                tabIndex={0}
+                role="button"
+                aria-label={`${getStateName(uf)}: ${pluralize(count, "registro", "registros")}`}
+                aria-pressed={selected}
+                onMouseEnter={() => setHovered(uf)}
+                onMouseLeave={() => setHovered(null)}
+                onFocus={() => setHovered(uf)}
+                onBlur={() => setHovered(null)}
+                onClick={() => onSelect(uf)}
+                onKeyDown={(e) => onKeyDown(e, uf)}
+              />
+            );
+          })}
+        </g>
       </svg>
 
       <div
         aria-live="polite"
-        className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-sm border border-[var(--line)] bg-[var(--bg-elevated)]/95 px-3 py-1.5 text-center text-sm shadow-lg backdrop-blur-sm"
+        className="pointer-events-none absolute bottom-16 left-3 z-10 max-w-[240px] rounded-sm border border-[var(--line)] bg-[var(--bg-elevated)]/95 px-2.5 py-1.5 text-[15px] shadow-md sm:bottom-14 sm:left-5"
       >
         {tipUf ? (
           <>
             <span className="font-medium text-[var(--fg)]">
               {getStateName(tipUf)}
             </span>
-            <span className="mx-2 text-[var(--fg-subtle)]">·</span>
-            <span className="tabular-nums text-[var(--accent-soft)]">
+            <span className="text-[var(--fg-subtle)]"> ({tipUf})</span>
+            <span className="mx-1.5 text-[var(--fg-subtle)]">·</span>
+            <span className="tabular-nums text-[var(--accent)]">
               {formatCount(tipCount)}
             </span>
           </>
         ) : (
           <span className="text-[var(--fg-muted)]">
-            Passe o mouse ou use Tab nos estados
+            Clique em um estado do Brasil
           </span>
         )}
       </div>

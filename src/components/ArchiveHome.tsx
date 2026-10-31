@@ -24,6 +24,7 @@ import type {
 } from "@/lib/types";
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { COUNT_BUCKETS } from "@/lib/intensity";
 
 interface ArchiveHomeProps {
   payload: ContentPayload;
@@ -40,6 +41,7 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
   const { items: allItems } = payload;
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const onMapRoute = pathname === "/";
 
   const [state, setState] = useState<ArchiveUrlState>(() =>
     parseArchiveParams(searchParams),
@@ -57,11 +59,11 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
     (patch: Partial<ArchiveUrlState>) => {
       setState((prev) => {
         const merged = { ...prev, ...patch };
-        writeUrl(pathname, merged);
+        if (onMapRoute) writeUrl("/", merged);
         return merged;
       });
     },
-    [pathname],
+    [onMapRoute],
   );
 
   const mapCounts = useMemo(
@@ -94,24 +96,31 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
   const activeCategory: CategoryTab = state.cat ?? "todos";
   const sharePath = archiveStateToSharePath(state);
 
+  const openUf = (uf: UfCode) =>
+    pushState({
+      uf,
+      cat: state.cat ?? "todos",
+    });
+
   return (
-    <div className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col px-3 py-3 sm:px-5 sm:py-4">
-      <section className="relative flex min-h-0 flex-1 flex-col rounded-sm border border-[var(--line)] bg-[linear-gradient(180deg,rgba(20,20,22,0.9),rgba(11,11,12,0.4))] p-2 sm:p-4">
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 sm:mb-3">
+    <>
+      <BrazilMap
+        counts={mapCounts}
+        selectedUf={state.uf}
+        onSelect={openUf}
+      />
+
+      <div className="pointer-events-none fixed inset-x-0 top-16 z-20 flex justify-center px-3 sm:top-[4.25rem]">
+        <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-2 rounded-sm border border-[var(--line)] bg-[var(--bg-elevated)]/90 px-2 py-1.5 shadow-sm backdrop-blur-sm">
           <button
             type="button"
-            onClick={() =>
-              pushState({
-                uf: "BR",
-                cat: state.cat ?? "todos",
-              })
-            }
+            onClick={() => openUf("BR")}
             aria-pressed={state.uf === "BR"}
             className={cn(
-              "rounded-sm border px-3 py-2 text-sm transition-colors",
+              "rounded-sm border px-3 py-1.5 text-sm transition-colors",
               state.uf === "BR"
-                ? "border-[var(--accent)] bg-[var(--accent)]/20 text-[var(--accent-soft)]"
-                : "border-[var(--line)] text-[var(--fg-muted)] hover:border-[var(--accent)]/50 hover:text-[var(--fg)]",
+                ? "border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]"
+                : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]",
             )}
           >
             Brasil (nacional)
@@ -119,26 +128,27 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
               {formatCount(nationalCount)}
             </span>
           </button>
-          <p className="text-xs text-[var(--fg-subtle)]">
-            Clique em um estado · intensidade = quantidade
-          </p>
+          <span className="hidden h-4 w-px bg-[var(--line)] sm:block" aria-hidden />
+          <div
+            className="flex flex-wrap items-center gap-2 px-1 text-[12px] text-[var(--fg-muted)]"
+            aria-label="Legenda"
+          >
+            {COUNT_BUCKETS.map((b) => (
+              <span key={b.bucket} className="inline-flex items-center gap-1">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-[2px] border border-[var(--line)]"
+                  style={{ background: b.fill }}
+                  aria-hidden
+                />
+                {b.label}
+              </span>
+            ))}
+          </div>
         </div>
-
-        <BrazilMap
-          className="min-h-0 flex-1"
-          counts={mapCounts}
-          selectedUf={state.uf}
-          onSelect={(uf: UfCode) =>
-            pushState({
-              uf,
-              cat: state.cat ?? "todos",
-            })
-          }
-        />
-      </section>
+      </div>
 
       <StateDrawer
-        open={!!state.uf}
+        open={onMapRoute && !!state.uf}
         uf={state.uf}
         category={activeCategory}
         counts={drawerCounts}
@@ -160,6 +170,6 @@ export function ArchiveHome({ payload }: ArchiveHomeProps) {
         onTagChange={(tag) => pushState({ tag })}
         onSortChange={(ordem: SortOrder) => pushState({ ordem })}
       />
-    </div>
+    </>
   );
 }

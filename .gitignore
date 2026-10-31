@@ -23,6 +23,10 @@
 # misc
 .DS_Store
 *.pem
+/tmp
+
+# geo sources (regenerar com npm run generate:map)
+/tmp/geo
 
 # debug
 npm-debug.log*

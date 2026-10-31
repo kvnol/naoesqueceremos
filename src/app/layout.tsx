@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
 import { Header } from "@/components/Header";
+import { SiteFooter } from "@/components/SiteFooter";
+import { ArchiveHome } from "@/components/ArchiveHome";
+import { loadContent } from "@/lib/load-content";
 import "./globals.css";
 
 const display = Fraunces({
@@ -43,16 +47,27 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+/** ISR; CSV da planilha sem cache Next (ver load-content). */
+export const revalidate = 300;
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const payload = await loadContent();
+
   return (
     <html lang="pt-BR" className={`${display.variable} ${body.variable} h-full`}>
-      <body className="flex min-h-full flex-col antialiased">
+      <body className="relative h-full antialiased">
         <Header />
-        <main className="flex flex-1 flex-col">{children}</main>
+        {/* Mapa persistente sob todas as rotas */}
+        <Suspense fallback={null}>
+          <ArchiveHome payload={payload} />
+        </Suspense>
+        {/* Páginas (ex.: Sobre) como modal por cima */}
+        <div className="relative z-40">{children}</div>
+        <SiteFooter updatedAt={payload.updatedAt} source={payload.source} />
       </body>
     </html>
   );

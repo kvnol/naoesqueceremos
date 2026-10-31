@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { ArchiveHome } from "@/components/ArchiveHome";
-import { SiteFooter } from "@/components/SiteFooter";
-import { loadContent } from "@/lib/load-content";
 import { getStateName, isValidUf } from "@/lib/states";
 import { CATEGORY_TAB_LABELS, type CategoryTab } from "@/lib/types";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-/** ISR da página; o CSV da planilha é buscado sem cache do Next (ver load-content). */
-export const revalidate = 300;
-
+/**
+ * A home é o próprio mapa (montado no layout).
+ * Esta rota só ajusta metadata a partir da query.
+ */
 export async function generateMetadata({
   searchParams,
 }: {
@@ -26,9 +23,8 @@ export async function generateMetadata({
       catRaw && catRaw in CATEGORY_TAB_LABELS
         ? ` · ${CATEGORY_TAB_LABELS[catRaw as CategoryTab]}`
         : "";
-    const title = `${name}${catLabel}`;
     return {
-      title,
+      title: `${name}${catLabel}`,
       openGraph: {
         title: `Lembranças para 2030 — ${name}`,
         description: `Registros de memória política em ${name}. Não esqueceremos o que a extrema direita fez neste país.`,
@@ -41,16 +37,6 @@ export async function generateMetadata({
   };
 }
 
-export default async function HomePage() {
-  const payload = await loadContent();
-
-  return (
-    <>
-      {/* Suspense só por causa do useSearchParams no client — sem skeleton/animação */}
-      <Suspense fallback={null}>
-        <ArchiveHome payload={payload} />
-      </Suspense>
-      <SiteFooter updatedAt={payload.updatedAt} source={payload.source} />
-    </>
-  );
+export default function HomePage() {
+  return null;
 }

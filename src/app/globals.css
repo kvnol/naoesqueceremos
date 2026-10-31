@@ -1,22 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0b0b0c;
-  --bg-elevated: #141416;
-  --bg-panel: #121214;
-  --bg-muted: #1c1c1f;
-  --fg: #f2efe8;
-  --fg-muted: #a39e94;
-  --fg-subtle: #6f6a62;
-  --line: #2a2a2e;
-  --accent: #c45c26;
-  --accent-soft: #e8a05c;
+  --bg: #e7f4f2;
+  --bg-elevated: #ffffff;
+  --bg-panel: #f7fbfa;
+  --bg-muted: #dceeea;
+  --fg: #0b1f33;
+  --fg-muted: #3d5568;
+  --fg-subtle: #6a7f8f;
+  --line: #b7d0cb;
+  --accent: #0e4286;
+  --accent-soft: #2f67a8;
   --danger: #b33a3a;
-  --focus: #e8a05c;
-  --map-empty: #1a1a1d;
-  --map-stroke: #2f2f34;
-  --map-hover: #3a2218;
-  --shadow-panel: 0 24px 80px rgba(0, 0, 0, 0.55);
+  --focus: #0e4286;
+  --map-locked: #e7f4f2;
+  --map-ocean: #d9ece9;
+  --map-empty: #c9d9eb;
+  --map-stroke: #9bb8c9;
+  --map-stroke-br: #7a9eb5;
+  --shadow-panel: 0 24px 80px rgba(14, 66, 134, 0.18);
+  --chrome-bg: rgba(231, 244, 242, 0.82);
 }
 
 @theme inline {
@@ -33,22 +36,25 @@
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(196, 92, 38, 0.12), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(232, 160, 92, 0.05), transparent 45%),
-    var(--bg);
+  min-height: 100%;
+  overflow: hidden;
+  background: var(--map-ocean);
   color: var(--fg);
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 }
 
 ::selection {
-  background: rgba(196, 92, 38, 0.45);
+  background: rgba(14, 66, 134, 0.25);
   color: var(--fg);
 }
 
@@ -73,23 +79,70 @@ a {
   border: 0;
 }
 
+.map-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+.map-country-locked {
+  fill: var(--map-locked);
+  stroke: #b3cfc9;
+  stroke-width: 0.35;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
 .map-state {
   cursor: pointer;
-  stroke: var(--map-stroke);
-  stroke-width: 1;
-  transition: fill 160ms ease, stroke 160ms ease, opacity 160ms ease;
+  stroke: var(--map-stroke-br);
+  stroke-width: 0.6;
+  transition: fill 160ms ease, stroke 160ms ease, filter 160ms ease;
 }
 
 .map-state:hover,
 .map-state:focus-visible {
-  stroke: var(--accent-soft);
-  stroke-width: 1.5;
-  filter: brightness(1.12);
+  stroke: var(--accent);
+  stroke-width: 1.2;
+  filter: brightness(0.96);
 }
 
 .map-state[aria-pressed="true"] {
-  stroke: var(--accent-soft);
-  stroke-width: 2;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+
+.chrome-bar {
+  background: var(--chrome-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.page-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(11, 31, 51, 0.35);
+}
+
+.page-modal {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 4.5rem 1rem 2rem;
+}
+
+.page-modal-panel {
+  width: min(40rem, 100%);
+  margin-bottom: 2rem;
+  border: 1px solid var(--line);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-panel);
+  border-radius: 0.25rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
